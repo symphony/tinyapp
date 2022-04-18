@@ -1,0 +1,25 @@
+{
+  "name": "tinyapp",
+  "version": "1.0.0",
+  "description": "URL shortener school project",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/",
+    "start": "node lib/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/symphony/tinyapp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/symphony/tinyapp/issues"
+  },
+  "homepage": "https://github.com/symphony/tinyapp#readme",
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "mocha": "^9.2.2"
+  }
+}
