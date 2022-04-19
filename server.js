@@ -42,10 +42,10 @@ app.get('/*', (req, res) => {
 });
 
 // Add new url
-app.post('/urls', (req, res) => {
+app.post('/new', (req, res) => {
   const newId = generateRandomString(urlDatabase);
   urlDatabase[newId] = req.body.longURL;
-  res.redirect('/urls' + newId);
+  res.redirect('/urls');
 });
 
 // Edit url

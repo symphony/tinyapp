@@ -1,2 +1,2 @@
-# tinyapp
-URL shortener school project
+# TinyApp
+URL shortener school project built off Express Node.js
