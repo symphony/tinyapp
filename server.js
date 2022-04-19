@@ -1,41 +1,49 @@
 const { generateRandomString, autofillHttpPrefix } = require('./script');
 const express = require("express");
-const morgan = require('morgan');
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 
-// config
+// == config ==
 const PORT = 3000;
 const app = express();
 app.set('view engine', 'ejs');
 
-// our database
+// == our database ==
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-// middleware
-app.use(morgan());
+// == middleware ==
 app.use(bodyParser.urlencoded({extended: true}));
 
-// routing
+// == routing ==
+// homepage
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
 });
 
+// 'create new url' page
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// ShortURL's info/edit page
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
   const templateVars = { shortURL, longURL: urlDatabase[shortURL] };
   res.render('urls_show', templateVars);
 });
 
+// /u/shortUrl redirection to long url
 app.get('/u/:shortURL', (req, res) => {
   res.redirect(urlDatabase[req.params.shortURL]);
+});
+
+// login routing
+app.post('/login', (req, res) => {
+  res.redirect('url');
 });
 
 // Catch all
@@ -64,7 +72,8 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-// Start server
+
+// == start server ==
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
