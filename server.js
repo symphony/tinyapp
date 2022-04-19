@@ -4,8 +4,9 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 
 // == config ==
-const PORT = 3000;
 const app = express();
+const PORT = 3000;
+let successAlert = false;
 app.set('view engine', 'ejs');
 
 // == our database ==
@@ -17,10 +18,15 @@ const urlDatabase = {
 // == middleware ==
 app.use(bodyParser.urlencoded({extended: true}));
 
-// == routing ==
+// == get routing ==
 // homepage
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    urls: urlDatabase,
+    successAlert,
+    signedIn: res.cookie,
+  };
+  successAlert = false;
   res.render('urls_index', templateVars);
 });
 
@@ -36,19 +42,23 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-// /u/shortUrl redirection to long url
+// actual shortURL redirection
 app.get('/u/:shortURL', (req, res) => {
   res.redirect(urlDatabase[req.params.shortURL]);
-});
-
-// login routing
-app.post('/login', (req, res) => {
-  res.redirect('url');
 });
 
 // Catch all
 app.get('/*', (req, res) => {
   res.redirect('/urls');
+});
+
+
+// == post requests ==
+// login routing
+app.post('/login', (req, res) => {
+  res.cookie = req.body.username;
+  successAlert = true;
+  res.redirect('url');
 });
 
 // Add new url

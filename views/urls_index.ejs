@@ -12,8 +12,7 @@
 <body>
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
-    <% const loginSuccess = true ? true : false; %>
-    <% if (loginSuccess) { %>
+    <% if (successAlert) { %>
       <div class="alert alert-info" role="alert">Login Success!</div>
       <% } %>
     <h3>My URLs</h3>
