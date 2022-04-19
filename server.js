@@ -45,6 +45,10 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+app.get('/u/:shortID', (req, res) => {
+  res.redirect(urlDatabase[req.params.shortID]);
+});
+
 app.get('/*', (req, res) => {
   res.redirect('/urls');
 });
