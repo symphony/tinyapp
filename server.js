@@ -15,6 +15,21 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// functions
+const generateRandomString = () => {
+  const length = 6;
+  const pool = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+  let newString = '';
+  for (let i = 0; i < length; i++) {
+    const ranIndex = Math.floor(Math.random() * pool.length);
+    newString += Math.random() > 0.5 ? pool[ranIndex].toUpperCase() : pool[ranIndex];
+  }
+
+  // check if string already exists
+  return Object.keys(urlDatabase).includes(newString) ? generateRandomString() : newString;
+};
+
 // routes
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
@@ -31,8 +46,7 @@ app.get('/urls/:id', (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
-  urlDatabase[req.body.name] = req.body.name;
-  urlDatabase[req.body.longURL] = req.body.longURL;
+  urlDatabase[generateRandomString()] = req.body.longURL;
   res.send('Ok');
 });
 
