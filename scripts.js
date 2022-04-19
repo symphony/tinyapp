@@ -13,9 +13,9 @@ const generateRandomString = (database) => {
 
 const autofillHttpPrefix = ((res, req, next) => {
   const url = req.body.longURL;
-  console.log('ur', url);
+  console.log('url', url);
   res.body.longURL = url.includes('://') ? url : 'https://' + url;
-  console.log('ur now', req.body.longURL);
+  console.log('url now', req.body.longURL);
   next();
 });
 

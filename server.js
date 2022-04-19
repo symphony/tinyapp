@@ -1,11 +1,11 @@
+const { generateRandomString } = require('./scripts');
 const express = require("express");
 const app = express();
-const PORT = 3000;
 const bodyParser = require("body-parser");
-const { generateRandomString } = require('./scripts');
 
 // config
 app.set('view engine', 'ejs');
+const PORT = 3000;
 
 // our database
 const urlDatabase = {
@@ -16,7 +16,7 @@ const urlDatabase = {
 // middleware
 app.use(bodyParser.urlencoded({extended: true}));
 
-// routes
+// routing
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
@@ -32,10 +32,11 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-app.get('/u/:shortID', (req, res) => {
-  res.redirect(urlDatabase[req.params.shortID]);
+app.get('/u/:shortURL', (req, res) => {
+  res.redirect(urlDatabase[req.params.shortURL]);
 });
 
+// Catch all
 app.get('/*', (req, res) => {
   res.redirect('/urls');
 });
