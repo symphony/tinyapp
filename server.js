@@ -48,10 +48,10 @@ app.post('/urls', (req, res) => {
 });
 
 // Edit url
-app.put('/urls', (req, res) => {
+app.post('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
-  urlDatabase[shortURL] = req.body.newURL;
-  res.redirect('/urls');
+  urlDatabase[shortURL] = req.body.longURL;
+  res.redirect('/urls/' + shortURL);
 });
 
 // Delete url
