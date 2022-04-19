@@ -45,9 +45,13 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+app.get('/*', (req, res) => {
+  res.redirect('/urls');
+});
+
 app.post('/urls', (req, res) => {
   urlDatabase[generateRandomString()] = req.body.longURL;
-  res.send('Ok');
+  res.redirect('/urls');
 });
 
 // Start server
