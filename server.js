@@ -6,16 +6,13 @@ const bodyParser = require("body-parser");
 // config
 app.set('view engine', 'ejs');
 
-// middleware
-app.use(bodyParser.urlencoded({extended: true}));
-
 // our database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-// functions
+// our functions
 const generateRandomString = () => {
   const length = 6;
   const pool = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
@@ -29,6 +26,16 @@ const generateRandomString = () => {
   // check if string already exists
   return Object.keys(urlDatabase).includes(newString) ? generateRandomString() : newString;
 };
+
+// middleware
+app.use(bodyParser.urlencoded({extended: true}));
+// app.use('/urls_new', 'post', (res, req, next) => {
+//   const url = req.body.longURL;
+//   console.log('ur', url);
+//   res.body.longURL = url.includes('://') ? url : 'https://' + url;
+//   console.log('ur now', req.body.longURL);
+//   next();
+// });
 
 // routes
 app.get('/urls', (req, res) => {
@@ -54,8 +61,9 @@ app.get('/*', (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
-  urlDatabase[generateRandomString()] = req.body.longURL;
-  res.redirect('/urls');
+  const newId = generateRandomString();
+  urlDatabase[newId] = req.body.longURL;
+  res.redirect('/urls/' + newId);
 });
 
 // Start server
