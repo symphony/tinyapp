@@ -11,12 +11,9 @@ const generateRandomString = (database) => {
   return Object.keys(database).includes(newString) ? generateRandomString() : newString;
 };
 
-const autofillHttpPrefix = ((res, req, next) => {
+const autofillHttpPrefix = (req, res) => {
   const url = req.body.longURL;
-  console.log('url', url);
-  res.body.longURL = url.includes('://') ? url : 'https://' + url;
-  console.log('url now', req.body.longURL);
-  next();
-});
+  req.body.longURL = url.includes('://') ? url : 'https://' + url;
+};
 
 module.exports = { generateRandomString, autofillHttpPrefix };

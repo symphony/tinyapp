@@ -1,11 +1,12 @@
-const { generateRandomString } = require('./scripts');
+const { generateRandomString, autofillHttpPrefix } = require('./script');
 const express = require("express");
-const app = express();
+const morgan = require('morgan');
 const bodyParser = require("body-parser");
 
 // config
-app.set('view engine', 'ejs');
 const PORT = 3000;
+const app = express();
+app.set('view engine', 'ejs');
 
 // our database
 const urlDatabase = {
@@ -14,6 +15,7 @@ const urlDatabase = {
 };
 
 // middleware
+app.use(morgan());
 app.use(bodyParser.urlencoded({extended: true}));
 
 // routing
@@ -43,6 +45,7 @@ app.get('/*', (req, res) => {
 
 // Add new url
 app.post('/new', (req, res) => {
+  autofillHttpPrefix(req, res);
   const newId = generateRandomString(urlDatabase);
   urlDatabase[newId] = req.body.longURL;
   res.redirect('/urls');
