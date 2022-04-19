@@ -27,7 +27,8 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get('/urls/:id', (req, res) => {
-  const templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
+  const shortURL = req.params.id;
+  const templateVars = { shortURL, longURL: urlDatabase[shortURL] };
   res.render('urls_show', templateVars);
 });
 
@@ -44,6 +45,13 @@ app.post('/urls', (req, res) => {
   const newId = generateRandomString(urlDatabase);
   urlDatabase[newId] = req.body.longURL;
   res.redirect('/urls' + newId);
+});
+
+// Edit url
+app.put('/urls', (req, res) => {
+  const shortURL = req.params.id;
+  urlDatabase[shortURL] = req.body.newURL;
+  res.redirect('/urls');
 });
 
 // Delete url
