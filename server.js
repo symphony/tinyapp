@@ -6,13 +6,38 @@ const cookieParser = require('cookie-parser');
 // == config ==
 const app = express();
 const PORT = 3000;
-const sendAlert = [false, ''];
+const sendAlert = [false, '', ''];
 app.set('view engine', 'ejs');
 
-// == our database ==
-const urlDatabase = {
+const defaultUrls = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+};
+
+const enableAlert = (message, style = 'info') => {
+  sendAlert[0] = true;
+  sendAlert[1] = message;
+  sendAlert[2] = style;
+};
+
+const disableAlert = () => {
+  sendAlert[0] = false;
+  sendAlert[1] = '';
+};
+
+const createNewUser = (name) => {
+  database[name] = {
+    name,
+    urls: {...defaultUrls},
+  };
+};
+
+// == our database ==
+const database = {
+  admin: {
+    name: 'admin',
+    urls: {...defaultUrls},
+  }
 };
 
 // == middleware ==
@@ -22,13 +47,15 @@ app.use(cookieParser());
 // == get routing ==
 // homepage
 app.get('/urls', (req, res) => {
+  const username = req.cookies.username;
+  if (!database[username]) createNewUser(username);
   const templateVars = {
-    urls: urlDatabase,
+    username,
+    urls: database[username].urls,
     sendAlert,
-    username: req.cookies.username,
   };
   res.render('urls_index', templateVars);
-  sendAlert[0] = false;
+  disableAlert();
 });
 
 // 'create new url' page
@@ -39,14 +66,16 @@ app.get("/urls/new", (req, res) => {
 
 // ShortURL's info/edit page
 app.get('/urls/:id', (req, res) => {
+  const username = req.cookies.username;
   const shortURL = req.params.id;
-  const templateVars = { shortURL, longURL: urlDatabase[shortURL], username: req.cookies.username };
+  const templateVars = { username, shortURL, longURL: database[username].urls[shortURL] };
   res.render('urls_show', templateVars);
 });
 
 // actual shortURL redirection
-app.get('/u/:shortURL', (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL]);
+app.get('/u/:id', (req, res) => {
+  const userUrls = database[req.cookies.username].urls;
+  res.redirect(userUrls[req.params.id]);
 });
 
 // Catch all
@@ -59,40 +88,43 @@ app.get('/*', (req, res) => {
 // login routing
 app.post('/login', (req, res) => {
   const username = req.body.username.trim();
-  if (!username) return res.redirect('url');
+  if (!username) {
+    enableAlert('Login failed', 'warning');
+    return res.redirect('url');
+  }
   res.cookie('username', username);
-  console.log(req.cookies.username, 'logged in');
-  sendAlert[0] = true;
-  sendAlert[1] = 'Login Success!';
+  enableAlert('Login Success!');
   res.redirect('url');
+  console.log(req.cookies.username, 'logged in');
 });
 
 app.post('/logout', (req, res) => {
   res.clearCookie('username');
-  sendAlert[0] = true;
-  sendAlert[1] = 'Logged out';
+  enableAlert('Logged out', 'warning');
   res.redirect('url');
 });
 
 // Add new url
 app.post('/new', (req, res) => {
-  autofillHttpPrefix(req, res);
-  const newId = generateRandomString(urlDatabase);
-  urlDatabase[newId] = req.body.longURL;
+  const userUrls = database[req.cookies.username].urls;
+  const newId = generateRandomString(userUrls);
+  const longURL = autofillHttpPrefix(req.body.longURL);
+  userUrls[newId] = longURL;
   res.redirect('/urls');
 });
 
 // Edit url
 app.post('/urls/:id', (req, res) => {
+  const userUrls = database[req.cookies.username].urls;
   const shortURL = req.params.id;
-  autofillHttpPrefix(req, res);
-  urlDatabase[shortURL] = req.body.longURL;
+  const longURL = autofillHttpPrefix(req.body.longURL);
+  userUrls[shortURL] = longURL;
   res.redirect('/urls/' + shortURL);
 });
 
 // Delete url
 app.post('/urls/:id/delete', (req, res) => {
-  delete urlDatabase[req.params.id];
+  delete database[req.cookies.username].urls[req.params.id];
   res.redirect('/urls');
 });
 

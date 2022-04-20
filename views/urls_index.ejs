@@ -13,7 +13,7 @@
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
     <% if (sendAlert[0]) { %>
-      <div id="alert" class="alert alert-info text-center" role="alert" style="max-width: 400px; position: absolute; right: 1%"><%= sendAlert[1] %></div>
+      <div id="alert" class="alert text-center alert-<%= sendAlert[2] %>" role="alert" style="max-width: 400px; position: absolute; right: 1%"><%= sendAlert[1] %></div>
       <% } %>
     <% if (username) { %>
     <h3>My URLs</h3>
