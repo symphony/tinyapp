@@ -7,11 +7,6 @@ const app = express();
 const PORT = 3000;
 app.set('view engine', 'ejs');
 
-const defaultUrls = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
-
 const enableAlert = (res, message = '', style = 'info') => {
   res.cookie('alertMsg', message);
   res.cookie('alertStyle', style);
@@ -22,19 +17,27 @@ const clearAlert = (res) => {
   res.clearCookie('alertStyle');
 };
 
-const createNewUser = (name) => {
-  database[name] = {
-    name,
-    urls: {...defaultUrls},
+const createNewUser = (email, password) => {
+  const id = generateUniqueId(users);
+  users[id] = {
+    id,
+    email,
+    password
   };
 };
 
 // == our database ==
-const database = {
+const users = {
   admin: {
-    name: 'admin',
-    urls: {...defaultUrls},
-  }
+    id: 'admin',
+    email: 'admin@tinyurl.com',
+    password: 'verysecurepassword'
+  },
+};
+
+const urlDatabase = {
+  "b2xVn2": "http://www.lighthouselabs.ca",
+  "9sm5xK": "http://www.google.com"
 };
 
 // == middleware ==
@@ -46,10 +49,10 @@ app.use("/styles", express.static(`${__dirname}/styles/`));
 // homepage
 app.get('/urls', (req, res) => {
   const username = req.cookies.username;
-  if (!database[username]) createNewUser(username);
+  if (!users[username]) createNewUser(username);
   const templateVars = {
     username,
-    urls: database[username].urls,
+    urls: urlDatabase,
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
   };
@@ -68,18 +71,17 @@ app.get("/urls/new", (req, res) => {
 app.get('/urls/:id', (req, res) => {
   const username = req.cookies.username;
   const shortURL = req.params.id;
-  const templateVars = { username, shortURL, longURL: database[username].urls[shortURL] };
+  const templateVars = { username, shortURL, longURL: users[username].urls[shortURL] };
   res.render('urls_show', templateVars);
 });
 
 // actual shortURL redirection
 app.get('/u/:id', (req, res) => {
-  const userUrls = database[req.cookies.username].urls;
-  res.redirect(userUrls[req.params.id]);
+  res.redirect(urlDatabase[req.params.id]);
 });
 
 app.get('/register', (req, res) => {
-  const username = req.cookies.username;
+  const username = req.cookies.email;
   const templateVars = { username };
   res.render('register', templateVars);
 });
@@ -112,25 +114,23 @@ app.post('/logout', (req, res) => {
 
 // Add new url
 app.post('/new', (req, res) => {
-  const userUrls = database[req.cookies.username].urls;
   const longURL = autofillHttpPrefix(req.body.longURL);
-  const newId = generateUniqueId(userUrls);
-  userUrls[newId] = longURL;
+  const newId = generateUniqueId(urlDatabase);
+  urlDatabase[newId] = longURL;
   res.redirect('/urls');
 });
 
 // Edit url
 app.post('/urls/:id', (req, res) => {
-  const userUrls = database[req.cookies.username].urls;
   const shortURL = req.params.id;
   const longURL = autofillHttpPrefix(req.body.longURL);
-  userUrls[shortURL] = longURL;
+  urlDatabase[shortURL] = longURL;
   res.redirect('/urls/' + shortURL);
 });
 
 // Delete url
 app.post('/urls/:id/delete', (req, res) => {
-  delete database[req.cookies.username].urls[req.params.id];
+  delete urlDatabase[req.params.id];
   res.redirect('/urls');
 });
 
