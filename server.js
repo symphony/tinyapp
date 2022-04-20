@@ -1,6 +1,5 @@
 const { generateRandomString, autofillHttpPrefix } = require('./script');
 const express = require("express");
-const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 
 // == config ==
@@ -40,12 +39,9 @@ const database = {
   }
 };
 
-const { globals } = database.admin.urls;
-
 // == middleware ==
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-
 
 // == get routing ==
 // homepage

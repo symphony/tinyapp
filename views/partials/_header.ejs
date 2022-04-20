@@ -16,11 +16,9 @@
       </ul>
         <% if (!username) { %>
         <form class="form-inline" method="POST" action="/login">
-          <div class="input-group">
           <input class="form-control" type="text" name="username" placeholder="Username" style="margin-right: 1em">
             <button type="submit" class="btn btn-dark" >Login</button>
           </input>
-        </div>
         </form>
         <% } else { %>
         <form type="button" class="form-inline" method="POST" action="/logout">
