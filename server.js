@@ -50,9 +50,9 @@ app.use("/styles", express.static(`${__dirname}/styles/`));
 // == get routing ==
 // homepage
 app.get('/urls', (req, res) => {
-  const username = req.cookies.username;
+  const user = users[req.cookies.user_id];
   const templateVars = {
-    username,
+    user,
     urls: urlDatabase,
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
@@ -63,16 +63,17 @@ app.get('/urls', (req, res) => {
 
 // 'create new url' page
 app.get("/urls/new", (req, res) => {
-  if (!req.cookies.username) return res.redirect('/urls');
-  const templateVars = { username: req.cookies.username };
+  const user = users[req.cookies.user_id];
+  if (!user) return res.redirect('/urls');
+  const templateVars = { user };
   res.render("urls_new", templateVars);
 });
 
 // ShortURL's info/edit page
 app.get('/urls/:id', (req, res) => {
-  const username = req.cookies.username;
+  const user = users[req.cookies.user_id];
   const shortURL = req.params.id;
-  const templateVars = { username, shortURL, longURL: urlDatabase[shortURL] };
+  const templateVars = { user, shortURL, longURL: urlDatabase[shortURL] };
   res.render('urls_show', templateVars);
 });
 
@@ -82,8 +83,8 @@ app.get('/u/:id', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  const username = req.cookies.username;
-  if (username) return res.redirect('/urls');
+  const user = users[req.cookies.user_id];
+  if (user) return res.redirect('/urls');
   const templateVars = {
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
@@ -125,26 +126,37 @@ app.post('/register', (req, res) => {
   // submitted successfully
   registerNewUser(email, password);
   enableAlert(res, 'Successfully Registered!');
-  console.log(email, 'registered');
   res.redirect('/login');
 });
 
 // login routing
 app.post('/login', (req, res) => {
-  const username = req.body.email.trim();
+  const email = req.body.email.trim();
   const password = req.body.password;
-  if (!username || !password) {
+
+  // error handling
+  if (!email || !password) {
     enableAlert(res, 'Login failed', 'danger');
     return res.redirect('/login');
   }
-  res.cookie('username', username);
+  // lookup user id by email
+  const user_id = Object.keys(users).find(id => users[id].email === email);
+  console.log("id", user_id);
+
+  if (!user_id || password !== users[user_id].password) {
+    enableAlert(res, 'Incorrect Login info', 'danger');
+    return res.redirect('/login');
+  }
+
+  // login success
+  res.cookie('user_id', user_id);
   enableAlert(res, 'Login Success!');
-  console.log(username, 'logged in');
+  console.log(email, 'logged in');
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   enableAlert(res, 'Logged out', 'warning');
   res.redirect('/urls');
 });

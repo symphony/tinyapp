@@ -10,9 +10,9 @@
           <a class="nav-link" href="/urls">My URLs</a>
           <a class="nav-link" href="/urls/new">Create New URL</a>
       </ul>
-      <% if (locals.username) { %>
+      <% if (locals.user?.email) { %>
         <form type="button" class="form-inline" method="POST" action="/logout">
-          <span class="navbar-text text-dark" style="margin-right: 1em;"><strong><%= username %></strong></span>
+          <span class="navbar-text text-dark" style="margin-right: 1em;"><strong><%= user.email %></strong></span>
           <button class="btn btn-light" >Logout</button>
         </form>
         <% } else { %>
