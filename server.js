@@ -58,7 +58,7 @@ app.get('/*', (req, res) => {
 // == post requests ==
 // login routing
 app.post('/login', (req, res) => {
-  const username = req.body.username;
+  const username = req.body.username.trim();
   if (!username) return res.redirect('url');
   res.cookie('username', username);
   console.log(req.cookies.username, 'logged in');
