@@ -40,9 +40,12 @@ const database = {
   }
 };
 
+const { globals } = database.admin.urls;
+
 // == middleware ==
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+
 
 // == get routing ==
 // homepage
@@ -89,13 +92,13 @@ app.get('/*', (req, res) => {
 app.post('/login', (req, res) => {
   const username = req.body.username.trim();
   if (!username) {
-    enableAlert('Login failed', 'warning');
+    enableAlert('Login failed', 'danger');
     return res.redirect('url');
   }
   res.cookie('username', username);
   enableAlert('Login Success!');
+  console.log(username, 'logged in');
   res.redirect('url');
-  console.log(req.cookies.username, 'logged in');
 });
 
 app.post('/logout', (req, res) => {
@@ -107,8 +110,8 @@ app.post('/logout', (req, res) => {
 // Add new url
 app.post('/new', (req, res) => {
   const userUrls = database[req.cookies.username].urls;
-  const newId = generateRandomString(userUrls);
   const longURL = autofillHttpPrefix(req.body.longURL);
+  const newId = generateRandomString(userUrls);
   userUrls[newId] = longURL;
   res.redirect('/urls');
 });
