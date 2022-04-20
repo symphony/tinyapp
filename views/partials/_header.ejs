@@ -10,18 +10,14 @@
           <a class="nav-link" href="/urls">My URLs</a>
           <a class="nav-link" href="/urls/new">Create New URL</a>
       </ul>
-      <% if (username) { %>
+      <% if (locals.username) { %>
         <form type="button" class="form-inline" method="POST" action="/logout">
           <span class="navbar-text text-dark" style="margin-right: 1em;"><strong><%= username %></strong></span>
           <button class="btn btn-light" >Logout</button>
         </form>
         <% } else { %>
-          <a class="nav-link text-dark" href="/register">Register</a>
-          <form class="form-inline" method="POST" action="/login">
-            <input class="form-control input-light" type="text" name="username" placeholder="Username" style="margin-right: 1em">
-              <button type="submit" class="btn btn-dark" >Login</button>
-            </input>
-          </form>
+          <a href="/login"><button type="button"class="btn btn-dark" style="margin-right: 1em">Login</button></a>
+            <a href="/register"><button type="button" class="btn btn-primary" style="margin-right: 1em">Register</button></a>
           <% } %>
       </div>
     </div>

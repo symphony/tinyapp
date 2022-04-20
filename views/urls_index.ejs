@@ -13,10 +13,8 @@
 <body>
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
-    <% if (alertMsg) { %>
-      <div id="alert" class="alert text-center alert-<%= alertStyle %>" role="alert" style="max-width: 400px; position: absolute; right: 1%"><%= alertMsg %></div>
-      <% } %>
-    <% if (username) { %>
+    <%- include('partials/_alert') %>
+    <% if (locals.username) { %>
     <h3>My URLs</h3>
     <table class="table">
       <thead>

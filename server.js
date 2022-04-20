@@ -2,11 +2,7 @@ const { generateUniqueId, autofillHttpPrefix } = require('./script');
 const express = require("express");
 const cookieParser = require('cookie-parser');
 
-// == config ==
-const app = express();
-const PORT = 3000;
-app.set('view engine', 'ejs');
-
+// == helper functions ==
 const enableAlert = (res, message = '', style = 'info') => {
   res.cookie('alertMsg', message);
   res.cookie('alertStyle', style);
@@ -17,7 +13,7 @@ const clearAlert = (res) => {
   res.clearCookie('alertStyle');
 };
 
-const createNewUser = (email, password) => {
+const registerNewUser = (email, password) => {
   const id = generateUniqueId(users);
   users[id] = {
     id,
@@ -40,6 +36,12 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+
+// == server config ==
+const app = express();
+const PORT = 3000;
+app.set('view engine', 'ejs');
+
 // == middleware ==
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
@@ -49,7 +51,6 @@ app.use("/styles", express.static(`${__dirname}/styles/`));
 // homepage
 app.get('/urls', (req, res) => {
   const username = req.cookies.username;
-  if (!users[username]) createNewUser(username);
   const templateVars = {
     username,
     urls: urlDatabase,
@@ -71,7 +72,7 @@ app.get("/urls/new", (req, res) => {
 app.get('/urls/:id', (req, res) => {
   const username = req.cookies.username;
   const shortURL = req.params.id;
-  const templateVars = { username, shortURL, longURL: users[username].urls[shortURL] };
+  const templateVars = { username, shortURL, longURL: urlDatabase[shortURL] };
   res.render('urls_show', templateVars);
 });
 
@@ -81,9 +82,22 @@ app.get('/u/:id', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  const username = req.cookies.email;
-  const templateVars = { username };
+  const username = req.cookies.username;
+  if (username) return res.redirect('/urls');
+  const templateVars = {
+    alertMsg: req.cookies.alertMsg,
+    alertStyle: req.cookies.alertStyle
+  };
   res.render('register', templateVars);
+});
+
+
+app.get('/login', (req, res) => {
+  const templateVars = {
+    alertMsg: req.cookies.alertMsg,
+    alertStyle: req.cookies.alertStyle
+  };
+  res.render('login', templateVars);
 });
 
 // Catch all
@@ -93,23 +107,42 @@ app.get('/*', (req, res) => {
 
 
 // == post requests ==
+// register submission
+app.post('/register', (req, res) => {
+  const email = req.body.email.trim();
+  const password = req.body.password;
+  if (!email || !password) {
+    enableAlert(res, 'Please Try Again', 'warning');
+    return res.redirect('/register');
+  }
+  if (password !== req.body.passwordRepeat) {
+    enableAlert(res, 'Passwords do not match', 'warning');
+    return res.redirect('/register');
+  }
+  registerNewUser(email, password);
+  enableAlert(res, 'Successfully Registered!');
+  console.log(email, 'registered');
+  res.redirect('/urls');
+});
+
 // login routing
 app.post('/login', (req, res) => {
-  const username = req.body.username.trim();
-  if (!username) {
+  const username = req.body.email.trim();
+  const password = req.body.password;
+  if (!username || !password) {
     enableAlert(res, 'Login failed', 'danger');
-    return res.redirect('url');
+    return res.redirect('/login');
   }
   res.cookie('username', username);
   enableAlert(res, 'Login Success!');
   console.log(username, 'logged in');
-  res.redirect('url');
+  res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
   res.clearCookie('username');
   enableAlert(res, 'Logged out', 'warning');
-  res.redirect('url');
+  res.redirect('/urls');
 });
 
 // Add new url
@@ -134,13 +167,6 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-app.post('/register', (req, res) => {
-  const email = req.body.email.trim();
-  const password = req.body.password;
-  enableAlert(res, 'Successfully Registered!');
-  console.log(email, 'registered');
-  res.redirect('url');
-});
 
 
 // == start server ==
