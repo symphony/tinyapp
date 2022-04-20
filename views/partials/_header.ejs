@@ -15,9 +15,9 @@
           </input>
         </form>
         <% } else { %>
-        <form class="form-inline" method="POST" action="/logout">
-            <label style="margin-right: 1em"><%= username %></label>
-            <button type="button" class="btn btn-light" >Logout</button>
+        <form type="button" class="form-inline" method="POST" action="/logout">
+          <label class="navbar-dark" style="margin-right: 1em"><%= username %></label>
+          <button class="btn btn-light" >Logout</button>
         </form>
         <% } %>
       </div>

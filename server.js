@@ -58,15 +58,17 @@ app.get('/*', (req, res) => {
 // == post requests ==
 // login routing
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  console.log("user", req.cookies.username);
+  const username = req.body.username;
+  if (!username) return res.redirect('url');
+  res.cookie('username', username);
+  console.log(req.cookies.username, 'logged in');
   sendAlert[0] = true;
   sendAlert[1] = 'Login Success!';
   res.redirect('url');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie();
+  res.clearCookie('username');
   sendAlert[0] = true;
   sendAlert[1] = 'Logged out';
   res.redirect('url');
