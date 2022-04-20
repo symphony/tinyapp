@@ -111,6 +111,8 @@ app.get('/*', (req, res) => {
 app.post('/register', (req, res) => {
   const email = req.body.email.trim();
   const password = req.body.password;
+
+  // error handling
   if (!email || !password) {
     enableAlert(res, 'Please Try Again', 'warning');
     return res.redirect('/register');
@@ -119,10 +121,12 @@ app.post('/register', (req, res) => {
     enableAlert(res, 'Passwords do not match', 'warning');
     return res.redirect('/register');
   }
+
+  // submitted successfully
   registerNewUser(email, password);
   enableAlert(res, 'Successfully Registered!');
   console.log(email, 'registered');
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 // login routing

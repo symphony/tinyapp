@@ -11,16 +11,21 @@
 <body>
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
-    <%- include('partials/_alert') %>
-    <h1>Register New Account</h1>
+    <div class="m-auto text-center">
+      <h2>Register New Account</h2>
+      <br>
       <form class="form-group" method="POST" action="/register">
-        <input class="form-control bg-light text-dark" name="email" placeholder="me@hello.com" style="max-width: 300px;"></input>
+        <input class="form-control bg-light text-dark m-auto" name="email" placeholder="me@hello.com" style="max-width: 300px;"></input>
         <br>
-        <input class="form-control bg-light text-dark" name="password" placeholder="Password" style="max-width: 300px; margin-bottom: 4px;"></input>
-        <input type="password" class="form-control bg-light text-dark" name="passwordRepeat" placeholder="Repeat Password" style="max-width: 300px;"></input>
+        <div class="m-auto">
+          <input class="form-control bg-light text-dark" name="password" placeholder="Password" style="max-width: 300px; margin: inherit; margin-bottom: 4px;"></input>
+          <input class="form-control bg-light text-dark" name="passwordRepeat" placeholder="Repeat Password" type="password" style="max-width: 300px; margin: inherit;"></input>
+        </div>
         <br>
         <button type="submit" class="btn btn-dark" >Submit</button>
       </form>
+      <%- include('partials/_alert') %>
+    </div>
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

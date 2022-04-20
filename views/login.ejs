@@ -11,15 +11,18 @@
 <body>
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
-    <%- include('partials/_alert') %>
-    <h1>Login</h1>
+    <div class="m-auto text-center">
+      <h2>Please Login</h2>
+      <br>
       <form class="form-group" method="POST" action="/login">
-        <input class="form-control bg-light text-dark" name="email" placeholder="me@hello.com" style="max-width: 200px;"></input>
+        <input class="form-control bg-light text-dark m-auto" name="email" placeholder="Email" style="max-width: 200px;"></input>
         <br>
-        <input class="form-control bg-light text-dark" name="password" placeholder="Password" style="max-width: 200px;"></input>
+        <input class="form-control bg-light text-dark m-auto" name="password" placeholder="Password" style="max-width: 200px;"></input>
         <br>
         <button type="submit" class="btn btn-dark" >Login</button>
       </form>
+      <%- include('partials/_alert') %>
+    </div>
 
   </main>
   <!-- Bootstrap JS -->
