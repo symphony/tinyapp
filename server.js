@@ -1,11 +1,10 @@
-const { generateRandomString, autofillHttpPrefix } = require('./script');
+const { generateUniqueId, autofillHttpPrefix } = require('./script');
 const express = require("express");
 const cookieParser = require('cookie-parser');
 
 // == config ==
 const app = express();
 const PORT = 3000;
-const sendAlert = [false, '', ''];
 app.set('view engine', 'ejs');
 
 const defaultUrls = {
@@ -13,15 +12,14 @@ const defaultUrls = {
   "9sm5xK": "http://www.google.com"
 };
 
-const enableAlert = (message, style = 'info') => {
-  sendAlert[0] = true;
-  sendAlert[1] = message;
-  sendAlert[2] = style;
+const enableAlert = (res, message = '', style = 'info') => {
+  res.cookie('alertMsg', message);
+  res.cookie('alertStyle', style);
 };
 
-const disableAlert = () => {
-  sendAlert[0] = false;
-  sendAlert[1] = '';
+const clearAlert = (res) => {
+  res.clearCookie('alertMsg');
+  res.clearCookie('alertStyle');
 };
 
 const createNewUser = (name) => {
@@ -42,6 +40,7 @@ const database = {
 // == middleware ==
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use("/styles", express.static(`${__dirname}/styles/`));
 
 // == get routing ==
 // homepage
@@ -51,14 +50,16 @@ app.get('/urls', (req, res) => {
   const templateVars = {
     username,
     urls: database[username].urls,
-    sendAlert,
+    alertMsg: req.cookies.alertMsg,
+    alertStyle: req.cookies.alertStyle
   };
+  clearAlert(res);
   res.render('urls_index', templateVars);
-  disableAlert();
 });
 
 // 'create new url' page
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies.username) return res.redirect('/urls');
   const templateVars = { username: req.cookies.username };
   res.render("urls_new", templateVars);
 });
@@ -77,6 +78,12 @@ app.get('/u/:id', (req, res) => {
   res.redirect(userUrls[req.params.id]);
 });
 
+app.get('/register', (req, res) => {
+  const username = req.cookies.username;
+  const templateVars = { username };
+  res.render('register', templateVars);
+});
+
 // Catch all
 app.get('/*', (req, res) => {
   res.redirect('/urls');
@@ -88,18 +95,18 @@ app.get('/*', (req, res) => {
 app.post('/login', (req, res) => {
   const username = req.body.username.trim();
   if (!username) {
-    enableAlert('Login failed', 'danger');
+    enableAlert(res, 'Login failed', 'danger');
     return res.redirect('url');
   }
   res.cookie('username', username);
-  enableAlert('Login Success!');
+  enableAlert(res, 'Login Success!');
   console.log(username, 'logged in');
   res.redirect('url');
 });
 
 app.post('/logout', (req, res) => {
   res.clearCookie('username');
-  enableAlert('Logged out', 'warning');
+  enableAlert(res, 'Logged out', 'warning');
   res.redirect('url');
 });
 
@@ -107,7 +114,7 @@ app.post('/logout', (req, res) => {
 app.post('/new', (req, res) => {
   const userUrls = database[req.cookies.username].urls;
   const longURL = autofillHttpPrefix(req.body.longURL);
-  const newId = generateRandomString(userUrls);
+  const newId = generateUniqueId(userUrls);
   userUrls[newId] = longURL;
   res.redirect('/urls');
 });
@@ -125,6 +132,14 @@ app.post('/urls/:id', (req, res) => {
 app.post('/urls/:id/delete', (req, res) => {
   delete database[req.cookies.username].urls[req.params.id];
   res.redirect('/urls');
+});
+
+app.post('/register', (req, res) => {
+  const email = req.body.email.trim();
+  const password = req.body.password;
+  enableAlert(res, 'Successfully Registered!');
+  console.log(email, 'registered');
+  res.redirect('url');
 });
 
 
