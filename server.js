@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 // == config ==
 const app = express();
 const PORT = 3000;
-let successAlert = false;
+const sendAlert = [false, ''];
 app.set('view engine', 'ejs');
 
 // == our database ==
@@ -17,28 +17,30 @@ const urlDatabase = {
 
 // == middleware ==
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 // == get routing ==
 // homepage
 app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    successAlert,
-    signedIn: res.cookie,
+    sendAlert,
+    username: req.cookies.username,
   };
-  successAlert = false;
   res.render('urls_index', templateVars);
+  sendAlert[0] = false;
 });
 
 // 'create new url' page
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = { username: req.cookies.username };
+  res.render("urls_new", templateVars);
 });
 
 // ShortURL's info/edit page
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
-  const templateVars = { shortURL, longURL: urlDatabase[shortURL] };
+  const templateVars = { shortURL, longURL: urlDatabase[shortURL], username: req.cookies.username };
   res.render('urls_show', templateVars);
 });
 
@@ -56,8 +58,17 @@ app.get('/*', (req, res) => {
 // == post requests ==
 // login routing
 app.post('/login', (req, res) => {
-  res.cookie = req.body.username;
-  successAlert = true;
+  res.cookie('username', req.body.username);
+  console.log("user", req.cookies.username);
+  sendAlert[0] = true;
+  sendAlert[1] = 'Login Success!';
+  res.redirect('url');
+});
+
+app.post('/logout', (req, res) => {
+  res.clearCookie();
+  sendAlert[0] = true;
+  sendAlert[1] = 'Logged out';
   res.redirect('url');
 });
 
@@ -72,6 +83,7 @@ app.post('/new', (req, res) => {
 // Edit url
 app.post('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
+  autofillHttpPrefix(req, res);
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect('/urls/' + shortURL);
 });

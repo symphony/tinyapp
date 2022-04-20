@@ -12,9 +12,10 @@
 <body>
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
-    <% if (successAlert) { %>
-      <div class="alert alert-info" role="alert">Login Success!</div>
+    <% if (sendAlert[0]) { %>
+      <div class="alert alert-info text-center" role="alert" style="max-width: 400px; position: absolute; right: 1%"><%= sendAlert[1] %></div>
       <% } %>
+    <% if (username) { %>
     <h3>My URLs</h3>
     <table class="table">
       <thead>
@@ -36,6 +37,9 @@
         <% } %>
       </tbody>
     </table>
+    <% } else { %>
+      <h3>Please Login</h3>
+      <% } %>
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
