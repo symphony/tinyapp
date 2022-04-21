@@ -13,6 +13,7 @@ const generateUniqueId = (database, length = 4, accumulator = 5) => {
 
 const autofillHttpPrefix = (longURL) => {
   const cleanUrl = longURL.trim();
+  if (!cleanUrl) return null;
   return cleanUrl.includes('://') ? cleanUrl : 'https://' + cleanUrl;
 };
 
@@ -26,9 +27,9 @@ const clearAlert = (res) => {
   res.clearCookie('alertStyle');
 };
 
-const registerNewUser = (database, email, password) => {
-  const id = generateUniqueId(database);
-  database[id] = {
+const registerNewUser = (userDatabase, email, password) => {
+  const id = generateUniqueId(userDatabase);
+  userDatabase[id] = {
     id,
     email,
     password
@@ -36,15 +37,15 @@ const registerNewUser = (database, email, password) => {
 };
 
 // prevents use of form submission using cache
-const isForbidden = (req, database) => !database[req.cookies.user_id];
+const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] || (shortURL ? userID !== shortURL.userID : false);
 
-const getUserByEmail = (database, email) => Object.values(database).find(user => user.email === email);
+const getUserByEmail = (userDatabase, email) => Object.values(userDatabase).find(user => user.email === email);
 
-const getUsersUrls = (database, userID) => {
-  return Object.keys(database).filter(urlID => {
-    return database[urlID].userID === userID;
+const getUsersUrls = (urlDatabase, userID) => {
+  return Object.keys(urlDatabase).filter(urlID => {
+    return urlDatabase[urlID].userID === userID;
   }).reduce((newObj, key) => {
-    return {...newObj, [key]: database[key]};
+    return {...newObj, [key]: urlDatabase[key]};
   }, {});
 };
 

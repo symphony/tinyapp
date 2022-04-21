@@ -25,10 +25,12 @@ const users = {
 
 const urlDatabase = {
   "b2xVn2": {
+    id: 'b2xVn2',
     longURL: 'http://www.lighthouselabs.ca',
     userID: 'admin'
   },
   "9sm5xK": {
+    id: '9sm5xK',
     longURL: 'http://www.google.com',
     userID: 'admin'
   }
@@ -75,9 +77,15 @@ app.get("/urls/new", (req, res) => {
 // ShortURL's info/edit page
 app.get('/urls/:id', (req, res) => {
   const user = users[req.cookies.user_id];
-  const shortURL = req.params.id;
-  if (!user || !urlDatabase[shortURL]) return res.redirect('/url');
-  const templateVars = { user, shortURL, longURL: urlDatabase[shortURL].longURL };
+  const shortURL = urlDatabase[req.params.id];
+  if (!user || !shortURL) return res.redirect('/url');
+  if (user.id !== shortURL.userID) return res.redirect('/url');
+  const templateVars = {
+    user,
+    shortURL,
+    alertMsg: req.cookies.alertMsg,
+    alertStyle: req.cookies.alertStyle
+  };
   res.render('urls_show', templateVars);
 });
 
@@ -170,28 +178,56 @@ app.post('/logout', (req, res) => {
 
 // Add new url
 app.post('/new', (req, res) => {
-  if (isForbidden(req, users)) return res.sendStatus(403);
+  // check permissions
+  const userID = req.cookies.user_id;
+  if (isForbidden(userID, users)) return res.sendStatus(403);
+
+  // error handling
   const longURL = autofillHttpPrefix(req.body.longURL);
+  if (!longURL) {
+    sendAlert(res, 'Invalid URL', 'danger');
+    return res.redirect('/new');
+  }
+
+  // success
   const newId = generateUniqueId(urlDatabase);
-  urlDatabase[newId] = { longURL, userID: req.cookies.user_id};
+  urlDatabase[newId] = { longURL, userID};
   res.redirect('/urls');
 });
 
 // Edit url
 app.post('/urls/:id', (req, res) => {
-  if (isForbidden(req, users)) return res.sendStatus(403);
-  const shortURL = req.params.id;
+  // check permissions
+  const userID = req.cookies.user_id;
+  const shortURL = urlDatabase[req.params.id];
+  if (isForbidden(userID, users)) return res.sendStatus(403);
+  if (userID !== shortURL.userID) return res.sendStatus(403);
+
+  // error handling
   const longURL = autofillHttpPrefix(req.body.longURL);
-  urlDatabase[shortURL] = {longURL};
-  sendAlert(res, 'Updated ' + shortURL);
-  res.redirect('/urls/' + shortURL);
+  if (!longURL) {
+    sendAlert(res, 'Invalid URL', 'danger');
+    return res.redirect('/urls/' + shortURL.id);
+  }
+
+  // success
+  shortURL.longURL = longURL;
+  sendAlert(res, 'Updated ' + shortURL.id);
+  res.redirect('/urls/' + shortURL.id);
+  console.log("testing here,", shortURL, "db", urlDatabase);
 });
 
 // Delete url
 app.post('/urls/:id/delete', (req, res) => {
-  if (isForbidden(req, users)) return res.sendStatus(403);
-  delete urlDatabase[req.params.id];
-  sendAlert(res, 'Successfully deleted ' + req.params.id);
+  // check permissions
+  const userID = req.cookies.user_id;
+  const shortURL = urlDatabase[req.params.id];
+  if (isForbidden(userID, users)) return res.sendStatus(403);
+  if (userID !== shortURL.userID) return res.sendStatus(403);
+
+  // success
+  sendAlert(res, 'Successfully deleted ' + shortURL.id);
+  delete shortURL;
   res.redirect('/urls');
 });
 
