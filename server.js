@@ -1,6 +1,6 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
-const util = require('util');
+const bcrypt = require('bcryptjs');
 
 // == helper functions ==
 const {
@@ -14,12 +14,13 @@ const {
   getUsersOwnedUrls,
   } = require('./helpers');
 
+
 // == our database ==
 const users = {
   admin: {
     id: 'admin',
     email: 'admin',
-    password: 'admin'
+    password: '$2a$10$1iRy0u0g0yXrwChQktRNb.XtkiKb2csrShY2k9Rz8B2DUUjaaVkqW'
   },
 };
 
@@ -42,6 +43,7 @@ const app = express();
 const PORT = 3000;
 app.set('view engine', 'ejs');
 
+
 // == middleware ==
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
@@ -63,6 +65,7 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
+
 // New url page
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies.user_id];
@@ -74,6 +77,7 @@ app.get("/urls/new", (req, res) => {
   };
   res.render("urls_new", templateVars);
 });
+
 
 // ShortURL's details page
 app.get('/urls/:id', (req, res) => {
@@ -90,12 +94,14 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+
 // actual shortURL redirection
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id]?.longURL;
   if (!longURL) return res.redirect('/url');
   res.redirect(longURL);
 });
+
 
 // register page
 app.get('/register', (req, res) => {
@@ -106,6 +112,7 @@ app.get('/register', (req, res) => {
   };
   res.render('register', templateVars);
 });
+
 
 // login page
 app.get('/login', (req, res) => {
@@ -144,10 +151,12 @@ app.post('/register', (req, res) => {
   }
 
   // new account success
-  registerNewUser(users, email, password);
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  registerNewUser(users, email, hashedPassword);
   sendAlert(res, 'Successfully Registered!');
   res.redirect('/login');
 });
+
 
 // login request
 app.post('/login', (req, res) => {
@@ -159,9 +168,9 @@ app.post('/login', (req, res) => {
     sendAlert(res, 'Login failed', 'danger');
     return res.redirect('/login');
   }
-  // lookup user id by email
+
   const user = getUserByEmail(users, email);
-  if (!user || password !== user.password) {
+  if (!user || !bcrypt.compareSync(password, user.password)) {
     sendAlert(res, 'Incorrect Login info', 'danger');
     return res.redirect('/login');
   }
@@ -172,12 +181,14 @@ app.post('/login', (req, res) => {
   res.redirect('/urls');
 });
 
+
 // logout request
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
   sendAlert(res, 'Logged out', 'warning');
   res.redirect('/urls');
 });
+
 
 // New url request
 app.post('/urls/new', (req, res) => {
@@ -199,6 +210,7 @@ app.post('/urls/new', (req, res) => {
   res.redirect('/urls');
 });
 
+
 // Edit url
 app.post('/urls/:id', (req, res) => {
   // edit permissions
@@ -219,6 +231,7 @@ app.post('/urls/:id', (req, res) => {
   sendAlert(res, 'Updated ' + shortURL.id);
   res.redirect('/urls/' + shortURL.id);
 });
+
 
 // Delete url
 app.post('/urls/:id/delete', (req, res) => {
