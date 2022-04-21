@@ -12,10 +12,10 @@
       <div class="card-header"></div>
       <div class="card-body">
         <h2 class="card-text">TinyURL: <a href="/u/<%= shortURL.id %>"><%= shortURL.id %></a></h2>
-        <h5 class="card-title">For: <a href="<%= shortURL.longURL %>"><%= shortURL.longURL %></a></h5>
+        <h5 class="card-title"><a href="<%= shortURL.longURL %>"><%= shortURL.longURL %></a></h5>
       </div>
       <div class="card-footer text-muted">
-        <h4 class="card-text m-2">Update <%= shortURL.id %></h4>
+        <h4 class="card-text m-2">Update destination for <%= shortURL.id %> </h4>
         <form class="form-group form-inline" action="/urls/<%= shortURL.id %>" method="POST">
         <div class="form-group m-auto">
           <h5 for="longURL" class= "m-auto" >New URL:</h5>

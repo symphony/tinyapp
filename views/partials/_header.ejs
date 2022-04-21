@@ -7,8 +7,12 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
+        <% if (!locals.user?.email) { %>
+          <a class="nav-link" href="/login">My URLs</a>
+          <% } else { %>
           <a class="nav-link" href="/urls">My URLs</a>
           <a class="nav-link" href="/urls/new">Create New URL</a>
+          <% } %>
       </ul>
       <% if (!locals.user?.email) { %>
         <a href="/login"><button type="button"class="btn btn-dark" style="margin-right: 1em">Login</button></a>

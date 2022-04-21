@@ -73,7 +73,7 @@ app.get('/', (req, res) => {
 // protected page
 app.get('/urls', (req, res) => {
   const user = users[req.session.user_id];
-  if (!user) return res.redirect('/');
+  if (!user) return res.redirect('/login');
   const urls = getUsersOwnedUrls(user?.id, urlDatabase);
   const templateVars = {
     user,
@@ -89,7 +89,7 @@ app.get('/urls', (req, res) => {
 // New url page
 app.get("/urls/new", (req, res) => {
   const user = users[req.session.user_id];
-  if (!user) return res.redirect('/urls');
+  if (!user) return res.redirect('/login');
   const templateVars = {
     user,
     alertMsg: req.cookies?.alertMsg,
@@ -103,8 +103,8 @@ app.get("/urls/new", (req, res) => {
 app.get('/urls/:id', (req, res) => {
   const user = users[req.session.user_id];
   const shortURL = urlDatabase[req.params.id];
-  if (!user || !shortURL) return res.redirect('/url'); // user or shorturl not registered
-  if (user.id !== shortURL.userID) return res.redirect('/url'); // user doesn't own short url
+  if (!user || !shortURL) return res.redirect('/urls'); // user or shorturl not registered
+  if (user.id !== shortURL.userID) return res.redirect('/urls'); // user doesn't own short url
   const templateVars = {
     user,
     shortURL,
@@ -118,7 +118,7 @@ app.get('/urls/:id', (req, res) => {
 // actual shortURL redirection
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id]?.longURL;
-  if (!longURL) return res.redirect('/url');
+  if (!longURL) return res.redirect('/urls'); // go to urls if id doesn't exist
   res.redirect(longURL);
 });
 
@@ -146,7 +146,7 @@ app.get('/login', (req, res) => {
 
 // Catch all
 app.get('/*', (req, res) => {
-  res.redirect('/urls');
+  res.redirect('/');
 });
 
 
@@ -206,7 +206,7 @@ app.post('/login', (req, res) => {
 app.post('/logout', (req, res) => {
   req.session = null;
   sendAlert(res, 'Logged out', 'warning');
-  res.redirect('/urls');
+  res.redirect('/');
 });
 
 
