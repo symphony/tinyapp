@@ -13,7 +13,7 @@
 <body>
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
-    <div style="top: 20px; right: 180px; position: absolute">
+    <div style="top: 20px; right: 110px; position: absolute">
       <%- include('partials/_alert') %>
     </div>
     <% if (locals.user) { %>
@@ -44,7 +44,7 @@
         <h1>Welcome to TinyApp</h1>
         <br>
         <br>
-        <a href="/register" style="font-size: 24px;">Register</a>
+        <a href="/register"><button type="button" class="btn btn-primary m-auto" style="margin-right: 1em">Register</button></a>
         <br>
         <br>
         <a href="/login">Login</a>

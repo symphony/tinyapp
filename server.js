@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
+const util = require('util');
 
 // == helper functions ==
 const {
@@ -12,7 +13,6 @@ const {
   getUserByEmail,
   getUsersUrls,
   } = require('./script');
-
 
 // == our database ==
 const users = {
@@ -47,6 +47,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use("/styles", express.static(`${__dirname}/styles/`));
 
+
 // == get routing ==
 // homepage
 app.get('/urls', (req, res) => {
@@ -62,7 +63,7 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-// 'create new url' page
+// New url page
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies.user_id];
   if (!user) return res.redirect('/urls');
@@ -74,7 +75,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-// ShortURL's info/edit page
+// ShortURL's details page
 app.get('/urls/:id', (req, res) => {
   const user = users[req.cookies.user_id];
   const shortURL = urlDatabase[req.params.id];
@@ -97,6 +98,7 @@ app.get('/u/:id', (req, res) => {
   res.redirect(longURL);
 });
 
+// register page
 app.get('/register', (req, res) => {
   if (users[req.cookies.user_id]) return res.redirect('/urls');
   const templateVars = {
@@ -106,6 +108,7 @@ app.get('/register', (req, res) => {
   res.render('register', templateVars);
 });
 
+// login page
 app.get('/login', (req, res) => {
   if (users[req.cookies.user_id]) return res.redirect('/urls');
   const templateVars = {
@@ -122,12 +125,12 @@ app.get('/*', (req, res) => {
 
 
 // == post requests ==
-// register submission
+// new account request
 app.post('/register', (req, res) => {
   const email = req.body.email.trim();
   const password = req.body.password;
 
-  // error handling
+  // new account error handling
   if (!email || !password) {
     sendAlert(res, 'Please Try Again', 'warning');
     return res.redirect('/register');
@@ -141,7 +144,7 @@ app.post('/register', (req, res) => {
     return res.redirect('/register');
   }
 
-  // submitted successfully
+  // new account success
   registerNewUser(users, email, password);
   sendAlert(res, 'Successfully Registered!');
   res.redirect('/login');
@@ -152,7 +155,7 @@ app.post('/login', (req, res) => {
   const email = req.body.email.trim();
   const password = req.body.password;
 
-  // error handling
+  // login error handling
   if (!email || !password) {
     sendAlert(res, 'Login failed', 'danger');
     return res.redirect('/login');
@@ -177,58 +180,58 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-// Add new url
+// New url request
 app.post('/urls/new', (req, res) => {
-  // check permissions
+  // new url permissions
   const userID = req.cookies.user_id;
   if (isForbidden(userID, users)) return res.sendStatus(403);
 
-  // error handling
+  // new url error handling
   const longURL = autofillHttpPrefix(req.body.longURL);
   if (!longURL) {
     sendAlert(res, 'Invalid URL', 'danger');
     return res.redirect('/urls/new');
   }
 
-  // success
+  // new url success
   const id = generateUniqueId(urlDatabase);
   urlDatabase[id] = {id, longURL, userID};
+  sendAlert(res, 'Added new Short URL', 'success');
   res.redirect('/urls');
 });
 
 // Edit url
 app.post('/urls/:id', (req, res) => {
-  // check permissions
+  // edit permissions
   const userID = req.cookies.user_id;
   const shortURL = urlDatabase[req.params.id];
   if (isForbidden(userID, users)) return res.sendStatus(403);
   if (userID !== shortURL.userID) return res.sendStatus(403);
 
-  // error handling
+  // edit error handling
   const longURL = autofillHttpPrefix(req.body.longURL);
   if (!longURL) {
     sendAlert(res, 'Invalid URL', 'danger');
     return res.redirect('/urls/' + shortURL.id);
   }
 
-  // success
+  // edit success
   shortURL.longURL = longURL;
   sendAlert(res, 'Updated ' + shortURL.id);
   res.redirect('/urls/' + shortURL.id);
-  console.log("testing here,", shortURL, "db", urlDatabase);
 });
 
 // Delete url
 app.post('/urls/:id/delete', (req, res) => {
-  // check permissions
+  // delete permissions
   const userID = req.cookies.user_id;
   const shortURL = urlDatabase[req.params.id];
   if (isForbidden(userID, users)) return res.sendStatus(403);
   if (userID !== shortURL.userID) return res.sendStatus(403);
 
-  // success
-  sendAlert(res, 'Successfully deleted ' + shortURL.id);
+  // delete success
   delete urlDatabase[shortURL.id];
+  sendAlert(res, 'Successfully deleted ' + shortURL.id);
   res.redirect('/urls');
 });
 
