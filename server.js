@@ -43,7 +43,7 @@ const urlDatabase = {
 
 // == server config ==
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.set('view engine', 'ejs');
 
 
@@ -90,7 +90,7 @@ app.get("/urls/new", (req, res) => {
 app.get('/urls/:id', (req, res) => {
   const user = users[req.session.user_id];
   const shortURL = urlDatabase[req.params.id];
-  if (!user || !shortURL) return res.redirect('/url'); // not logged in
+  if (!user || !shortURL) return res.redirect('/url'); // user or shorturl not registered
   if (user.id !== shortURL.userID) return res.redirect('/url'); // user doesn't own short url
   const templateVars = {
     user,
@@ -112,7 +112,7 @@ app.get('/u/:id', (req, res) => {
 
 // register page
 app.get('/register', (req, res) => {
-  if (users[req.session.user_id]) return res.redirect('/urls');
+  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle
@@ -123,7 +123,7 @@ app.get('/register', (req, res) => {
 
 // login page
 app.get('/login', (req, res) => {
-  if (users[req.session.user_id]) return res.redirect('/urls');
+  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle

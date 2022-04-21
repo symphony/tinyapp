@@ -1,4 +1,4 @@
-const { assert } = require('chai');
+const { assert, Assertion } = require('chai');
 const {
   generateUniqueId,
   autofillHttpPrefix,
@@ -28,5 +28,9 @@ describe('getUserByEmail', function() {
     const user = getUserByEmail("user@example.com", testUsers);
     const expectedUserID = "userRandomID";
     assert(user, expectedUserID);
+  }),
+  it('should return undefined if not found', function() {
+    const user = getUserByEmail("not@realemail", testUsers);
+    assert.isUndefined(user);
   });
 });
