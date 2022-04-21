@@ -35,9 +35,26 @@ const registerNewUser = (database, email, password) => {
   };
 };
 
-const getUserByEmail = (database, email) => Object.values(database).find(user => user.email === email);
-
 // prevents use of form submission using cache
 const isForbidden = (req, database) => !database[req.cookies.user_id];
 
-module.exports = { generateUniqueId, autofillHttpPrefix, sendAlert, clearAlert, registerNewUser, isForbidden, getUserByEmail };
+const getUserByEmail = (database, email) => Object.values(database).find(user => user.email === email);
+
+const getUsersUrls = (database, userID) => {
+  return Object.keys(database).filter(urlID => {
+    return database[urlID].userID === userID;
+  }).reduce((newObj, key) => {
+    return {...newObj, [key]: database[key]};
+  }, {});
+};
+
+module.exports = {
+  generateUniqueId,
+  autofillHttpPrefix,
+  sendAlert,
+  clearAlert,
+  registerNewUser,
+  isForbidden,
+  getUserByEmail,
+  getUsersUrls
+};

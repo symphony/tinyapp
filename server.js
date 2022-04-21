@@ -1,10 +1,18 @@
-const { generateUniqueId, autofillHttpPrefix, sendAlert, clearAlert } = require('./script');
-const { registerNewUser, isForbidden, getUserByEmail } = require('./script');
 const express = require("express");
 const cookieParser = require('cookie-parser');
 
 // == helper functions ==
-// moved to script.js
+const {
+  generateUniqueId,
+  autofillHttpPrefix,
+  sendAlert,
+  clearAlert,
+  registerNewUser,
+  isForbidden,
+  getUserByEmail,
+  getUsersUrls,
+  } = require('./script');
+
 
 // == our database ==
 const users = {
@@ -41,11 +49,10 @@ app.use("/styles", express.static(`${__dirname}/styles/`));
 // homepage
 app.get('/urls', (req, res) => {
   const user = users[req.cookies.user_id];
-  // const urls = Object.entries(urlDatabase).filter(([key, {userID}]) => (userID === user.id)).reduce(id, url);
-  // console.log("filtered urls", urls);
+  const urls = getUsersUrls(urlDatabase, user?.id);
   const templateVars = {
     user,
-    urls: urlDatabase,
+    urls,
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
   };
@@ -166,7 +173,7 @@ app.post('/new', (req, res) => {
   if (isForbidden(req, users)) return res.sendStatus(403);
   const longURL = autofillHttpPrefix(req.body.longURL);
   const newId = generateUniqueId(urlDatabase);
-  urlDatabase[newId] = { longURL, ...req.cookies.user_id};
+  urlDatabase[newId] = { longURL, userID: req.cookies.user_id};
   res.redirect('/urls');
 });
 
