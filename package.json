@@ -1,7 +1,7 @@
 {
   "name": "tinyapp",
   "version": "1.0.0",
-  "description": "URL shortener api built off express node.js",
+  "description": "URL shortener api built using express node.js",
   "main": "server.js",
   "scripts": {
     "test": "mocha test/",

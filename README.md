@@ -5,7 +5,7 @@ URL Shortener API built using Express Node.js
 
 **Install Dependencies:**
 
-`(in project folder) npm install`
+`npm install` (in project folder)
 
 **Run the Server:**
 
@@ -13,7 +13,7 @@ URL Shortener API built using Express Node.js
 
 **Visit the API:**
 
-`http://localhost:3000 (port number)`
+`http://localhost:3000` (default port number)
 
 
 ## Documentation
@@ -30,10 +30,10 @@ Main Features
 
 ---
 
-![Screenshot of TinyApp Homepage](screens/tiny1.png?raw=true "Homepage")
+![Screenshot of TinyApp Homepage](docs/tiny1.png?raw=true "Homepage")
 
-![Screenshot of New URL](screens/tiny2.png?raw=true "New Short URL")
+![Screenshot of New URL](docs/tiny2.png?raw=true "New Short URL")
 
-![Screenshot of Dashboard](screens/tiny3.png?raw=true "User Dashboard")
+![Screenshot of Dashboard](docs/tiny3.png?raw=true "User Dashboard")
 
-![Screenshot of Edit Page](screens/tiny4.png?raw=true "Edit Page")
+![Screenshot of Edit Page](docs/tiny4.png?raw=true "Edit Page")
