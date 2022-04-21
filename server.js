@@ -1,4 +1,5 @@
-const { generateUniqueId, autofillHttpPrefix, enableAlert, clearAlert, registerNewUser } = require('./script');
+const { generateUniqueId, autofillHttpPrefix, sendAlert, clearAlert } = require('./script');
+const { registerNewUser, isForbidden, getUserByEmail } = require('./script');
 const express = require("express");
 const cookieParser = require('cookie-parser');
 
@@ -48,13 +49,18 @@ app.get('/urls', (req, res) => {
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies.user_id];
   if (!user) return res.redirect('/urls');
-  const templateVars = { user };
+  const templateVars = {
+    user,
+    alertMsg: req.cookies.alertMsg,
+    alertStyle: req.cookies.alertStyle
+  };
   res.render("urls_new", templateVars);
 });
 
 // ShortURL's info/edit page
 app.get('/urls/:id', (req, res) => {
   const user = users[req.cookies.user_id];
+  if (!user) return res.redirect('/url');
   const shortURL = req.params.id;
   const templateVars = { user, shortURL, longURL: urlDatabase[shortURL] };
   res.render('urls_show', templateVars);
@@ -92,65 +98,65 @@ app.get('/*', (req, res) => {
 // == post requests ==
 // register submission
 app.post('/register', (req, res) => {
-  console.log("users before", users);
   const email = req.body.email.trim();
   const password = req.body.password;
 
   // error handling
   if (!email || !password) {
-    enableAlert(res, 'Please Try Again', 'warning');
+    sendAlert(res, 'Please Try Again', 'warning');
     return res.redirect('/register');
   }
-  if (Object.values(users).some(user => user.email === email)) {
-    enableAlert(res, 'Account already exists', 'danger');
+  if (getUserByEmail(users, email)) {
+    sendAlert(res, 'Account already exists', 'danger');
     return res.redirect('/register');
   }
   if (password !== req.body.passwordRepeat) {
-    enableAlert(res, 'Passwords do not match', 'warning');
+    sendAlert(res, 'Passwords do not match', 'warning');
     return res.redirect('/register');
   }
 
   // submitted successfully
   registerNewUser(users, email, password);
-  enableAlert(res, 'Successfully Registered!');
+  sendAlert(res, 'Successfully Registered!');
   res.redirect('/login');
   console.log("users after", users);
+
 });
 
-// login routing
+// login request
 app.post('/login', (req, res) => {
   const email = req.body.email.trim();
   const password = req.body.password;
 
   // error handling
   if (!email || !password) {
-    enableAlert(res, 'Login failed', 'danger');
+    sendAlert(res, 'Login failed', 'danger');
     return res.redirect('/login');
   }
   // lookup user id by email
-  const userId = Object.keys(users).find(id => users[id].email === email);
-  console.log("id", userId);
-
-  if (!userId || password !== users[userId].password) {
-    enableAlert(res, 'Incorrect Login info', 'danger');
+  const user = getUserByEmail(users, email);
+  if (!user || password !== user.password) {
+    sendAlert(res, 'Incorrect Login info', 'danger');
     return res.redirect('/login');
   }
 
   // login success
-  res.cookie('user_id', userId);
-  enableAlert(res, 'Login Success!');
+  res.cookie('user_id', user.id);
+  sendAlert(res, 'Login Success!');
   console.log(email, 'logged in');
   res.redirect('/urls');
 });
 
+// logout request
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
-  enableAlert(res, 'Logged out', 'warning');
+  sendAlert(res, 'Logged out', 'warning');
   res.redirect('/urls');
 });
 
 // Add new url
 app.post('/new', (req, res) => {
+  if (isForbidden(req, users)) return res.sendStatus(403);
   const longURL = autofillHttpPrefix(req.body.longURL);
   const newId = generateUniqueId(urlDatabase);
   urlDatabase[newId] = longURL;
@@ -160,18 +166,21 @@ app.post('/new', (req, res) => {
 
 // Edit url
 app.post('/urls/:id', (req, res) => {
+  if (isForbidden(req, users)) return res.sendStatus(403);
   const shortURL = req.params.id;
   const longURL = autofillHttpPrefix(req.body.longURL);
   urlDatabase[shortURL] = longURL;
+  sendAlert(res, 'Updated ' + shortURL);
   res.redirect('/urls/' + shortURL);
 });
 
 // Delete url
 app.post('/urls/:id/delete', (req, res) => {
+  if (isForbidden(req, users)) return res.sendStatus(403);
   delete urlDatabase[req.params.id];
+  sendAlert(res, 'Successfully deleted ' + req.params.id);
   res.redirect('/urls');
 });
-
 
 
 // == start server ==

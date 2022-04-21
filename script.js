@@ -1,5 +1,3 @@
-
-
 const generateUniqueId = (database, length = 4, accumulator = 5) => {
   const pool = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
   let newId = '';
@@ -18,7 +16,7 @@ const autofillHttpPrefix = (longURL) => {
   return cleanUrl.includes('://') ? cleanUrl : 'https://' + cleanUrl;
 };
 
-const enableAlert = (res, message = '', style = 'info') => {
+const sendAlert = (res, message = '', style = 'info') => {
   res.cookie('alertMsg', message);
   res.cookie('alertStyle', style);
 };
@@ -37,4 +35,9 @@ const registerNewUser = (database, email, password) => {
   };
 };
 
-module.exports = { generateUniqueId, autofillHttpPrefix, enableAlert, clearAlert, registerNewUser };
+const getUserByEmail = (database, email) => Object.values(database).find(user => user.email === email);
+
+// prevents use of form submission using cache
+const isForbidden = (req, database) => !database[req.cookies.user_id];
+
+module.exports = { generateUniqueId, autofillHttpPrefix, sendAlert, clearAlert, registerNewUser, isForbidden, getUserByEmail };
