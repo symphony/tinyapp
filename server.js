@@ -1,26 +1,9 @@
-const { generateUniqueId, autofillHttpPrefix } = require('./script');
+const { generateUniqueId, autofillHttpPrefix, enableAlert, clearAlert, registerNewUser } = require('./script');
 const express = require("express");
 const cookieParser = require('cookie-parser');
 
 // == helper functions ==
-const enableAlert = (res, message = '', style = 'info') => {
-  res.cookie('alertMsg', message);
-  res.cookie('alertStyle', style);
-};
-
-const clearAlert = (res) => {
-  res.clearCookie('alertMsg');
-  res.clearCookie('alertStyle');
-};
-
-const registerNewUser = (email, password) => {
-  const id = generateUniqueId(users);
-  users[id] = {
-    id,
-    email,
-    password
-  };
-};
+// moved to script.js
 
 // == our database ==
 const users = {
@@ -92,7 +75,6 @@ app.get('/register', (req, res) => {
   res.render('register', templateVars);
 });
 
-
 app.get('/login', (req, res) => {
   const templateVars = {
     alertMsg: req.cookies.alertMsg,
@@ -110,6 +92,7 @@ app.get('/*', (req, res) => {
 // == post requests ==
 // register submission
 app.post('/register', (req, res) => {
+  console.log("users before", users);
   const email = req.body.email.trim();
   const password = req.body.password;
 
@@ -118,15 +101,20 @@ app.post('/register', (req, res) => {
     enableAlert(res, 'Please Try Again', 'warning');
     return res.redirect('/register');
   }
+  if (Object.values(users).some(user => user.email === email)) {
+    enableAlert(res, 'Account already exists', 'danger');
+    return res.redirect('/register');
+  }
   if (password !== req.body.passwordRepeat) {
     enableAlert(res, 'Passwords do not match', 'warning');
     return res.redirect('/register');
   }
 
   // submitted successfully
-  registerNewUser(email, password);
+  registerNewUser(users, email, password);
   enableAlert(res, 'Successfully Registered!');
   res.redirect('/login');
+  console.log("users after", users);
 });
 
 // login routing
@@ -140,16 +128,16 @@ app.post('/login', (req, res) => {
     return res.redirect('/login');
   }
   // lookup user id by email
-  const user_id = Object.keys(users).find(id => users[id].email === email);
-  console.log("id", user_id);
+  const userId = Object.keys(users).find(id => users[id].email === email);
+  console.log("id", userId);
 
-  if (!user_id || password !== users[user_id].password) {
+  if (!userId || password !== users[userId].password) {
     enableAlert(res, 'Incorrect Login info', 'danger');
     return res.redirect('/login');
   }
 
   // login success
-  res.cookie('user_id', user_id);
+  res.cookie('user_id', userId);
   enableAlert(res, 'Login Success!');
   console.log(email, 'logged in');
   res.redirect('/urls');
@@ -167,6 +155,7 @@ app.post('/new', (req, res) => {
   const newId = generateUniqueId(urlDatabase);
   urlDatabase[newId] = longURL;
   res.redirect('/urls');
+  console.log("urls", urlDatabase);
 });
 
 // Edit url
