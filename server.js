@@ -11,8 +11,8 @@ const {
   registerNewUser,
   isForbidden,
   getUserByEmail,
-  getUsersUrls,
-  } = require('./script');
+  getUsersOwnedUrls,
+  } = require('./helpers');
 
 // == our database ==
 const users = {
@@ -52,7 +52,7 @@ app.use("/styles", express.static(`${__dirname}/styles/`));
 // homepage
 app.get('/urls', (req, res) => {
   const user = users[req.cookies.user_id];
-  const urls = getUsersUrls(urlDatabase, user?.id);
+  const urls = getUsersOwnedUrls(urlDatabase, user?.id);
   const templateVars = {
     user,
     urls,
@@ -79,15 +79,14 @@ app.get("/urls/new", (req, res) => {
 app.get('/urls/:id', (req, res) => {
   const user = users[req.cookies.user_id];
   const shortURL = urlDatabase[req.params.id];
-  if (!user || !shortURL) return res.redirect('/url');
-  if (user.id !== shortURL.userID) return res.redirect('/url');
+  if (!user || !shortURL) return res.redirect('/url'); // not logged in
+  if (user.id !== shortURL.userID) return res.redirect('/url'); // user doesn't own short url
   const templateVars = {
     user,
     shortURL,
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
   };
-  console.log('testing here', templateVars);
   res.render('urls_show', templateVars);
 });
 

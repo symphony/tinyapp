@@ -12,9 +12,9 @@ const generateUniqueId = (database, length = 4, accumulator = 5) => {
 };
 
 const autofillHttpPrefix = (longURL) => {
-  const cleanUrl = longURL.trim();
-  if (!cleanUrl) return null;
-  return cleanUrl.includes('://') ? cleanUrl : 'https://' + cleanUrl;
+  const trimmedUrl = longURL.trim();
+  if (!trimmedUrl) return null;
+  return trimmedUrl.includes('://') ? trimmedUrl : 'https://' + trimmedUrl;
 };
 
 const sendAlert = (res, message = '', style = 'info') => {
@@ -41,7 +41,7 @@ const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] ||
 
 const getUserByEmail = (userDatabase, email) => Object.values(userDatabase).find(user => user.email === email);
 
-const getUsersUrls = (urlDatabase, userID) => {
+const getUsersOwnedUrls = (urlDatabase, userID) => {
   return Object.keys(urlDatabase).filter(urlID => {
     return urlDatabase[urlID].userID === userID;
   }).reduce((newObj, key) => {
@@ -57,5 +57,5 @@ module.exports = {
   registerNewUser,
   isForbidden,
   getUserByEmail,
-  getUsersUrls
+  getUsersOwnedUrls,
 };
