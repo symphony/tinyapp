@@ -10,8 +10,8 @@ const cookieParser = require('cookie-parser');
 const users = {
   admin: {
     id: 'admin',
-    email: 'admin@tinyurl.com',
-    password: 'verysecurepassword'
+    email: 'admin',
+    password: 'password'
   },
 };
 
@@ -41,6 +41,8 @@ app.use("/styles", express.static(`${__dirname}/styles/`));
 // homepage
 app.get('/urls', (req, res) => {
   const user = users[req.cookies.user_id];
+  // const urls = Object.entries(urlDatabase).filter(([key, {userID}]) => (userID === user.id)).reduce(id, url);
+  // console.log("filtered urls", urls);
   const templateVars = {
     user,
     urls: urlDatabase,
