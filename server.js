@@ -59,8 +59,21 @@ app.use(cookieSession({
 
 // == get routing ==
 // homepage
+app.get('/', (req, res) => {
+  const user = users[req.session.user_id];
+  if (user) return res.redirect('/urls')
+  const templateVars = {
+    alertMsg: req.cookies?.alertMsg,
+    alertStyle: req.cookies?.alertStyle
+  };
+  clearAlert(res);
+  res.render('index', templateVars);
+});
+
+// protected page
 app.get('/urls', (req, res) => {
   const user = users[req.session.user_id];
+  if (!user) return res.redirect('/');
   const urls = getUsersOwnedUrls(user?.id, urlDatabase);
   const templateVars = {
     user,
@@ -184,7 +197,7 @@ app.post('/login', (req, res) => {
 
   // login success
   req.session.user_id = user.id;
-  sendAlert(res, 'Login Success!');
+  sendAlert(res, 'Signed in!');
   res.redirect('/urls');
 });
 
