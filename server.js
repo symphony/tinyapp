@@ -190,7 +190,7 @@ app.post('/login', (req, res) => {
 
 // logout request
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   sendAlert(res, 'Logged out', 'warning');
   res.redirect('/urls');
 });
