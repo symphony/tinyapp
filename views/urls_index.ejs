@@ -22,15 +22,15 @@
         <tr>
           <th scope="col" class="col-1">Short URL</th>
           <th scope="col" class="col-2">Long URL</th>
-          <th scope="col" class="col-1"> </th>
-          <th scope="col" class="col-3"> </th>
+          <th scope="col" class="col-1"></th>
+          <th scope="col" class="col-3"></th>
         </tr>
       </thead>
       <tbody class="table">
         <% for (const url in urls) { %>
           <tr>
             <td><a href='urls/<%= url %>'><%= url %></a></td>
-            <td><a href='<%= urls[url].longURL %>'><%= urls[url].longURL %></a></td>
+            <td><a href='<%= urls[url].longURL %>'><%= urls[url].longURL.replace(/(^\w+:|^)\/\//, '') %></a></td>
             <td><form type="button" action="urls/<%= url %>"><button class="btn btn-light">Edit</button></form></td>
             <td><form type="button" method="POST" action="urls/<%= url %>/delete"><button class="btn btn-danger">Delete</button></form></td>
           </tr>

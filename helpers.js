@@ -1,4 +1,4 @@
-const generateUniqueId = (database, length = 4, accumulator = 5) => {
+const generateUniqueId = (database, length = 6, accumulator = 5) => {
   const pool = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
   let newId = '';
   for (let i = 0; i < length; i++) {
@@ -17,6 +17,7 @@ const autofillHttpPrefix = (longURL) => {
   return trimmedUrl.includes('://') ? trimmedUrl : 'https://' + trimmedUrl;
 };
 
+// uses cookies to trigger alerts. will replace with non cookie version eventually
 const sendAlert = (res, message = '', style = 'info') => {
   res.cookie('alertMsg', message);
   res.cookie('alertStyle', style);
@@ -41,7 +42,7 @@ const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] ||
 
 const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find(user => user.email === email);
 
-const getUsersOwnedUrls = (userID, urlDatabase) => {
+const getUserUrls = (userID, urlDatabase) => {
   return Object.keys(urlDatabase).filter(urlID => {
     return urlDatabase[urlID].userID === userID;
   }).reduce((newObj, key) => {
@@ -57,5 +58,5 @@ module.exports = {
   registerNewUser,
   isForbidden,
   getUserByEmail,
-  getUsersOwnedUrls,
+  getUserUrls,
 };

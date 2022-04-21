@@ -12,13 +12,13 @@ const {
   registerNewUser,
   isForbidden,
   getUserByEmail,
-  getUsersOwnedUrls,
+  getUserUrls,
   } = require('./helpers');
 
 
 // == our database ==
 const users = {
-  // admin account for testing only
+  // used for testing only (delete before deploying)
   admin: {
     id: 'admin',
     email: 'admin',
@@ -50,7 +50,7 @@ app.set('view engine', 'ejs');
 // == middleware ==
 app.use("/styles", express.static(`${__dirname}/styles/`));
 app.use(express.urlencoded({extended: false}));
-app.use(cookieParser());
+app.use(cookieParser()); // needed for alerts (will update to use express flashes eventually)
 app.use(cookieSession({
   name: 'session',
   keys: ['topsecretstring'],
@@ -61,7 +61,7 @@ app.use(cookieSession({
 // homepage
 app.get('/', (req, res) => {
   const user = users[req.session.user_id];
-  if (user) return res.redirect('/urls')
+  if (user) return res.redirect('/urls');
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle
@@ -70,11 +70,12 @@ app.get('/', (req, res) => {
   res.render('index', templateVars);
 });
 
+
 // protected page
 app.get('/urls', (req, res) => {
   const user = users[req.session.user_id];
   if (!user) return res.redirect('/login');
-  const urls = getUsersOwnedUrls(user?.id, urlDatabase);
+  const urls = getUserUrls(user?.id, urlDatabase);
   const templateVars = {
     user,
     urls,
@@ -99,7 +100,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 
-// ShortURL's details page
+// ShortURL's edit page
 app.get('/urls/:id', (req, res) => {
   const user = users[req.session.user_id];
   const shortURL = urlDatabase[req.params.id];
@@ -111,7 +112,7 @@ app.get('/urls/:id', (req, res) => {
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle
   };
-  res.render('urls_show', templateVars);
+  res.render('urls_edit', templateVars);
 });
 
 

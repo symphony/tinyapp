@@ -1,14 +1,5 @@
-const { assert, Assertion } = require('chai');
-const {
-  generateUniqueId,
-  autofillHttpPrefix,
-  sendAlert,
-  clearAlert,
-  registerNewUser,
-  isForbidden,
-  getUserByEmail,
-  getUsersOwnedUrls,
-} = require('../helpers.js');
+const { assert } = require('chai');
+const { getUserByEmail } = require('../helpers.js');
 
 const testUsers = {
   "userRandomID": {
