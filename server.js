@@ -26,6 +26,7 @@ const users = {
   },
 };
 
+
 const urlDatabase = {
   "b2xVn2": {
     id: 'b2xVn2',
@@ -49,7 +50,7 @@ app.set('view engine', 'ejs');
 // == middleware ==
 app.use("/styles", express.static(`${__dirname}/styles/`));
 app.use(express.urlencoded({extended: false}));
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ['topsecretstring'],
@@ -60,12 +61,12 @@ app.use(cookieSession({
 // homepage
 app.get('/urls', (req, res) => {
   const user = users[req.session.user_id];
-  const urls = getUsersOwnedUrls(urlDatabase, user?.id);
+  const urls = getUsersOwnedUrls(user?.id, urlDatabase);
   const templateVars = {
     user,
     urls,
-    alertMsg: req.cookies.alertMsg,
-    alertStyle: req.cookies.alertStyle
+    alertMsg: req.cookies?.alertMsg,
+    alertStyle: req.cookies?.alertStyle
   };
   clearAlert(res);
   res.render('urls_index', templateVars);
@@ -78,8 +79,8 @@ app.get("/urls/new", (req, res) => {
   if (!user) return res.redirect('/urls');
   const templateVars = {
     user,
-    alertMsg: req.cookies.alertMsg,
-    alertStyle: req.cookies.alertStyle
+    alertMsg: req.cookies?.alertMsg,
+    alertStyle: req.cookies?.alertStyle
   };
   res.render("urls_new", templateVars);
 });
@@ -94,8 +95,8 @@ app.get('/urls/:id', (req, res) => {
   const templateVars = {
     user,
     shortURL,
-    alertMsg: req.cookies.alertMsg,
-    alertStyle: req.cookies.alertStyle
+    alertMsg: req.cookies?.alertMsg,
+    alertStyle: req.cookies?.alertStyle
   };
   res.render('urls_show', templateVars);
 });
@@ -113,8 +114,8 @@ app.get('/u/:id', (req, res) => {
 app.get('/register', (req, res) => {
   if (users[req.session.user_id]) return res.redirect('/urls');
   const templateVars = {
-    alertMsg: req.cookies.alertMsg,
-    alertStyle: req.cookies.alertStyle
+    alertMsg: req.cookies?.alertMsg,
+    alertStyle: req.cookies?.alertStyle
   };
   res.render('register', templateVars);
 });
@@ -124,8 +125,8 @@ app.get('/register', (req, res) => {
 app.get('/login', (req, res) => {
   if (users[req.session.user_id]) return res.redirect('/urls');
   const templateVars = {
-    alertMsg: req.cookies.alertMsg,
-    alertStyle: req.cookies.alertStyle
+    alertMsg: req.cookies?.alertMsg,
+    alertStyle: req.cookies?.alertStyle
   };
   res.render('login', templateVars);
 });
@@ -147,7 +148,7 @@ app.post('/register', (req, res) => {
     sendAlert(res, 'Please Try Again', 'warning');
     return res.redirect('/register');
   }
-  if (getUserByEmail(users, email)) {
+  if (getUserByEmail(email, users)) {
     sendAlert(res, 'Account already exists', 'danger');
     return res.redirect('/register');
   }

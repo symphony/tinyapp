@@ -39,9 +39,9 @@ const registerNewUser = (userDatabase, email, password) => {
 // prevents use of form submission using cache
 const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] || (shortURL ? userID !== shortURL.userID : false);
 
-const getUserByEmail = (userDatabase, email) => Object.values(userDatabase).find(user => user.email === email);
+const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find(user => user.email === email);
 
-const getUsersOwnedUrls = (urlDatabase, userID) => {
+const getUsersOwnedUrls = (userID, urlDatabase) => {
   return Object.keys(urlDatabase).filter(urlID => {
     return urlDatabase[urlID].userID === userID;
   }).reduce((newObj, key) => {
