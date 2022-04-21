@@ -50,7 +50,7 @@ app.set('view engine', 'ejs');
 // == middleware ==
 app.use("/styles", express.static(`${__dirname}/styles/`));
 app.use(express.urlencoded({extended: false}));
-// app.use(cookieParser());
+app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ['topsecretstring'],
@@ -176,7 +176,7 @@ app.post('/login', (req, res) => {
     return res.redirect('/login');
   }
 
-  const user = getUserByEmail(users, email);
+  const user = getUserByEmail(email, users);
   if (!user || !bcrypt.compareSync(password, user.password)) {
     sendAlert(res, 'Incorrect Login info', 'danger');
     return res.redirect('/login');
