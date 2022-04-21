@@ -16,8 +16,14 @@ const users = {
 };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    longURL: 'http://www.lighthouselabs.ca',
+    userID: 'admin'
+  },
+  "9sm5xK": {
+    longURL: 'http://www.google.com',
+    userID: 'admin'
+  }
 };
 
 
@@ -60,20 +66,21 @@ app.get("/urls/new", (req, res) => {
 // ShortURL's info/edit page
 app.get('/urls/:id', (req, res) => {
   const user = users[req.cookies.user_id];
-  if (!user) return res.redirect('/url');
   const shortURL = req.params.id;
-  const templateVars = { user, shortURL, longURL: urlDatabase[shortURL] };
+  if (!user || !urlDatabase[shortURL]) return res.redirect('/url');
+  const templateVars = { user, shortURL, longURL: urlDatabase[shortURL].longURL };
   res.render('urls_show', templateVars);
 });
 
 // actual shortURL redirection
 app.get('/u/:id', (req, res) => {
-  res.redirect(urlDatabase[req.params.id]);
+  const longURL = urlDatabase[req.params.id]?.longURL;
+  if (!longURL) return res.redirect('/url');
+  res.redirect(longURL);
 });
 
 app.get('/register', (req, res) => {
-  const user = users[req.cookies.user_id];
-  if (user) return res.redirect('/urls');
+  if (users[req.cookies.user_id]) return res.redirect('/urls');
   const templateVars = {
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
@@ -82,6 +89,7 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
+  if (users[req.cookies.user_id]) return res.redirect('/urls');
   const templateVars = {
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
@@ -119,8 +127,6 @@ app.post('/register', (req, res) => {
   registerNewUser(users, email, password);
   sendAlert(res, 'Successfully Registered!');
   res.redirect('/login');
-  console.log("users after", users);
-
 });
 
 // login request
@@ -143,7 +149,6 @@ app.post('/login', (req, res) => {
   // login success
   res.cookie('user_id', user.id);
   sendAlert(res, 'Login Success!');
-  console.log(email, 'logged in');
   res.redirect('/urls');
 });
 
@@ -159,9 +164,8 @@ app.post('/new', (req, res) => {
   if (isForbidden(req, users)) return res.sendStatus(403);
   const longURL = autofillHttpPrefix(req.body.longURL);
   const newId = generateUniqueId(urlDatabase);
-  urlDatabase[newId] = longURL;
+  urlDatabase[newId] = { longURL, ...req.cookies.user_id};
   res.redirect('/urls');
-  console.log("urls", urlDatabase);
 });
 
 // Edit url
@@ -169,7 +173,7 @@ app.post('/urls/:id', (req, res) => {
   if (isForbidden(req, users)) return res.sendStatus(403);
   const shortURL = req.params.id;
   const longURL = autofillHttpPrefix(req.body.longURL);
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL] = {longURL};
   sendAlert(res, 'Updated ' + shortURL);
   res.redirect('/urls/' + shortURL);
 });
