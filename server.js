@@ -228,7 +228,7 @@ app.post('/urls/:id/delete', (req, res) => {
 
   // success
   sendAlert(res, 'Successfully deleted ' + shortURL.id);
-  delete shortURL;
+  delete urlDatabase[shortURL.id];
   res.redirect('/urls');
 });
 
