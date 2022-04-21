@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 
 // == helper functions ==
@@ -17,6 +18,7 @@ const {
 
 // == our database ==
 const users = {
+  // admin account for testing only
   admin: {
     id: 'admin',
     email: 'admin',
@@ -45,15 +47,19 @@ app.set('view engine', 'ejs');
 
 
 // == middleware ==
+app.use("/styles", express.static(`${__dirname}/styles/`));
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use("/styles", express.static(`${__dirname}/styles/`));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['topsecretstring'],
+}));
 
 
 // == get routing ==
 // homepage
 app.get('/urls', (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   const urls = getUsersOwnedUrls(urlDatabase, user?.id);
   const templateVars = {
     user,
@@ -68,7 +74,7 @@ app.get('/urls', (req, res) => {
 
 // New url page
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   if (!user) return res.redirect('/urls');
   const templateVars = {
     user,
@@ -81,7 +87,7 @@ app.get("/urls/new", (req, res) => {
 
 // ShortURL's details page
 app.get('/urls/:id', (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   const shortURL = urlDatabase[req.params.id];
   if (!user || !shortURL) return res.redirect('/url'); // not logged in
   if (user.id !== shortURL.userID) return res.redirect('/url'); // user doesn't own short url
@@ -105,7 +111,7 @@ app.get('/u/:id', (req, res) => {
 
 // register page
 app.get('/register', (req, res) => {
-  if (users[req.cookies.user_id]) return res.redirect('/urls');
+  if (users[req.session.user_id]) return res.redirect('/urls');
   const templateVars = {
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
@@ -116,7 +122,7 @@ app.get('/register', (req, res) => {
 
 // login page
 app.get('/login', (req, res) => {
-  if (users[req.cookies.user_id]) return res.redirect('/urls');
+  if (users[req.session.user_id]) return res.redirect('/urls');
   const templateVars = {
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
@@ -150,7 +156,7 @@ app.post('/register', (req, res) => {
     return res.redirect('/register');
   }
 
-  // new account success
+  // new account success - add to database
   const hashedPassword = bcrypt.hashSync(password, 10);
   registerNewUser(users, email, hashedPassword);
   sendAlert(res, 'Successfully Registered!');
@@ -176,7 +182,7 @@ app.post('/login', (req, res) => {
   }
 
   // login success
-  res.cookie('user_id', user.id);
+  req.session.user_id = user.id;
   sendAlert(res, 'Login Success!');
   res.redirect('/urls');
 });
@@ -193,7 +199,7 @@ app.post('/logout', (req, res) => {
 // New url request
 app.post('/urls/new', (req, res) => {
   // new url permissions
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   if (isForbidden(userID, users)) return res.sendStatus(403);
 
   // new url error handling
@@ -214,7 +220,7 @@ app.post('/urls/new', (req, res) => {
 // Edit url
 app.post('/urls/:id', (req, res) => {
   // edit permissions
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   const shortURL = urlDatabase[req.params.id];
   if (isForbidden(userID, users)) return res.sendStatus(403);
   if (userID !== shortURL.userID) return res.sendStatus(403);
@@ -236,7 +242,7 @@ app.post('/urls/:id', (req, res) => {
 // Delete url
 app.post('/urls/:id/delete', (req, res) => {
   // delete permissions
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   const shortURL = urlDatabase[req.params.id];
   if (isForbidden(userID, users)) return res.sendStatus(403);
   if (userID !== shortURL.userID) return res.sendStatus(403);
