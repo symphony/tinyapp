@@ -12,12 +12,13 @@
     <%- include('partials/_header') %>
     <main style="margin: 1em;">
       <h3>Create TinyURL</h3>
-      <form class="form-inline" action="/new" method="POST">
+      <form class="form-inline" action="/urls/new" method="POST">
         <div class="form-group mb-2">
           <label for="longURL">Enter a URL:</label>
           <input class="form-control" type="text" name="longURL" placeholder="https://" style="width: 300px; margin: 1em">
           <button type="submit" class="btn btn-success">Submit</button>
         </div>
+        <%- include('partials/_alert') %>
       </form>
     </main>
       <!-- Bootstrap JS -->

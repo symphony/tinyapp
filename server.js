@@ -19,7 +19,7 @@ const users = {
   admin: {
     id: 'admin',
     email: 'admin',
-    password: 'password'
+    password: 'admin'
   },
 };
 
@@ -86,6 +86,7 @@ app.get('/urls/:id', (req, res) => {
     alertMsg: req.cookies.alertMsg,
     alertStyle: req.cookies.alertStyle
   };
+  console.log('testing here', templateVars);
   res.render('urls_show', templateVars);
 });
 
@@ -177,7 +178,7 @@ app.post('/logout', (req, res) => {
 });
 
 // Add new url
-app.post('/new', (req, res) => {
+app.post('/urls/new', (req, res) => {
   // check permissions
   const userID = req.cookies.user_id;
   if (isForbidden(userID, users)) return res.sendStatus(403);
@@ -186,12 +187,12 @@ app.post('/new', (req, res) => {
   const longURL = autofillHttpPrefix(req.body.longURL);
   if (!longURL) {
     sendAlert(res, 'Invalid URL', 'danger');
-    return res.redirect('/new');
+    return res.redirect('/urls/new');
   }
 
   // success
-  const newId = generateUniqueId(urlDatabase);
-  urlDatabase[newId] = { longURL, userID};
+  const id = generateUniqueId(urlDatabase);
+  urlDatabase[id] = {id, longURL, userID};
   res.redirect('/urls');
 });
 
