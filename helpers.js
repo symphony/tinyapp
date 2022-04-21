@@ -1,4 +1,4 @@
-const generateUniqueId = (database, length = 6, accumulator = 5) => {
+const generateUniqueId = (database, length = 6, accumulator = 20) => {
   const pool = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
   let newId = '';
   for (let i = 0; i < length; i++) {
