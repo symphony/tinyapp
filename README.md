@@ -3,6 +3,10 @@ URL Shortener API built using Express Node.js
 
 ## Usage
 
+**Clone or Download Project** 
+
+`git clone git@github.com:symphony/tinyapp.git`
+
 **Install Dependencies:**
 
 `npm install` (in project folder)
@@ -13,7 +17,7 @@ URL Shortener API built using Express Node.js
 
 **Visit the API:**
 
-`http://localhost:3000` (default port number)
+`http://localhost:3000` (3000 is default port)
 
 
 ## Documentation
