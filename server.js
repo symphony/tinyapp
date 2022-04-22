@@ -159,18 +159,18 @@ app.get('/login', (req, res) => {
 });
 
 
-// 404
-app.get('/error', (req, res) => {
-  const user = users[req.session.user_id];
-  res.status(404).render('error', { user });
-});
-
 app.get('/url', (req, res) => {
   res.redirect('/urls');
 });
 
 app.get('/new', (req, res) => {
   res.redirect('/urls/new');
+});
+
+// 404
+app.get('/error', (req, res) => {
+  const user = users[req.session.user_id];
+  res.status(404).render('error', { user });
 });
 
 // Catch all

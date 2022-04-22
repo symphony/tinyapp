@@ -32,6 +32,7 @@ Main Features
 * `Encrypted Session` - Cookie IDs are unique per session
 * `Dark Mode` - Easier on the eyes
 
+---
 ### Dependencies
 * `express 4.17`
 * `ejs 3.1.6`

@@ -1,4 +1,4 @@
-const generateUniqueId = (database, length = 6, timeout = 20) => {
+const generateUniqueId = (database, length = 6, attempts = 30) => {
   const pool = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
   let newId = '';
   for (let i = 0; i < length; i++) {
@@ -7,8 +7,8 @@ const generateUniqueId = (database, length = 6, timeout = 20) => {
   }
 
   // uses recursion to find unique id
-  if (timeout <= 0) throw TypeError("All unique IDs exhausted. Try longer ID length.");
-  return Object.keys(database).includes(newId) ? generateUniqueId(database, length, timeout - 1) : newId;
+  if (attempts <= 0) throw TypeError("All unique IDs exhausted. Try longer ID length.");
+  return Object.keys(database).includes(newId) ? generateUniqueId(database, length, attempts - 1) : newId;
 };
 
 // not a catch all, but helps with some improper url submissions
