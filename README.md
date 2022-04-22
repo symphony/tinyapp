@@ -3,7 +3,7 @@ URL Shortener API built using Express Node.js
 
 ## Usage
 
-**Clone or Download Project** 
+**Clone or Download Project**
 
 `git clone git@github.com:symphony/tinyapp.git`
 
@@ -31,6 +31,19 @@ Main Features
 * `Secure Registration` - Passwords are securely stored via one-way hashing
 * `Encrypted Session` - Cookie IDs are unique per session
 * `Dark Mode` - Easier on the eyes
+
+### Dependencies
+* `express 4.17`
+* `ejs 3.1.6`
+* `bcryptjs 2.4.3`
+* `cookie-parser 1.4.6`
+* `cookie-session 2.0.0`
+* `@forevolve/bootstrap-dark 2.1.0`
+
+### Dev Dependencies
+* `chai 4.3.6`
+* `mocha 9.2.2`
+* `nodemon 2.0.1`
 
 ---
 

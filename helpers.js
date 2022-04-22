@@ -1,4 +1,4 @@
-const generateUniqueId = (database, length = 6, accumulator = 20) => {
+const generateUniqueId = (database, length = 6, timeout = 20) => {
   const pool = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
   let newId = '';
   for (let i = 0; i < length; i++) {
@@ -6,11 +6,12 @@ const generateUniqueId = (database, length = 6, accumulator = 20) => {
     newId += Math.random() > 0.5 ? pool[ranIndex].toUpperCase() : pool[ranIndex];
   }
 
-  // use recursion to gaurantee unique id
-  if (accumulator <= 0) throw TypeError("All unique IDs exhausted. Try longer ID length.");
-  return Object.keys(database).includes(newId) ? generateUniqueId(database, length, accumulator - 1) : newId;
+  // uses recursion to find unique id
+  if (timeout <= 0) throw TypeError("All unique IDs exhausted. Try longer ID length.");
+  return Object.keys(database).includes(newId) ? generateUniqueId(database, length, timeout - 1) : newId;
 };
 
+// not a catch all, but helps with some improper url submissions
 const autofillHttpPrefix = (longURL) => {
   const trimmedUrl = longURL.trim();
   if (!trimmedUrl) return null;
@@ -37,15 +38,14 @@ const registerNewUser = (userDatabase, email, password) => {
   };
 };
 
-// prevents use of form submission using cache
+// prevents use of form submission via cache or command line
 const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] || (shortURL ? userID !== shortURL.userID : false);
 
 const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find(user => user.email === email);
 
 const getUserUrls = (userID, urlDatabase) => {
-  return Object.keys(urlDatabase).filter(urlID => {
-    return urlDatabase[urlID].userID === userID;
-  }).reduce((newObj, key) => {
+  const matchingUrls = Object.keys(urlDatabase).filter(urlID => urlDatabase[urlID].userID === userID);
+  return matchingUrls.reduce((newObj, key) => {
     return {...newObj, [key]: urlDatabase[key]};
   }, {});
 };

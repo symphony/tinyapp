@@ -90,12 +90,16 @@ app.get('/urls', (req, res) => {
 // New url page
 app.get("/urls/new", (req, res) => {
   const user = users[req.session.user_id];
-  if (!user) return res.redirect('/login');
+  if (!user) {
+    sendAlert(res, 'No Access', 'warning');
+    return res.redirect('/login');
+  };
   const templateVars = {
     user,
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle
   };
+  clearAlert(res);
   res.render("urls_new", templateVars);
 });
 
@@ -104,14 +108,18 @@ app.get("/urls/new", (req, res) => {
 app.get('/urls/:id', (req, res) => {
   const user = users[req.session.user_id];
   const shortURL = urlDatabase[req.params.id];
-  if (!user || !shortURL) return res.redirect('/urls'); // user or shorturl not registered
-  if (user.id !== shortURL.userID) return res.redirect('/urls'); // user doesn't own short url
+  if (!user || !shortURL) {
+    sendAlert(res, 'No Access', 'warning');
+    return res.redirect('/urls');
+  };
+  if (user.id !== shortURL.userID) return res.redirect('/urls', 401); // user doesn't own short url
   const templateVars = {
     user,
     shortURL,
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle
   };
+  clearAlert(res);
   res.render('urls_edit', templateVars);
 });
 
@@ -119,37 +127,48 @@ app.get('/urls/:id', (req, res) => {
 // actual shortURL redirection
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id]?.longURL;
-  if (!longURL) return res.redirect('/urls'); // go to urls if id doesn't exist
+  if (!longURL) {
+    sendAlert(res, 'No URL with that ID', 'warning');
+    return res.redirect('/');
+  };
   res.redirect(longURL);
 });
 
 
 // register page
 app.get('/register', (req, res) => {
-  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged
+  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle
   };
+  clearAlert(res);
   res.render('register', templateVars);
 });
 
 
 // login page
 app.get('/login', (req, res) => {
-  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged
+  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle
   };
+  clearAlert(res);
   res.render('login', templateVars);
+});
+
+
+// 404
+app.get('/not_found', (req, res) => {
+  const user = users[req.session.user_id];
+  res.render('/not_found', { user });
 });
 
 // Catch all
 app.get('/*', (req, res) => {
-  res.redirect('/');
+  res.redirect('/not_found');
 });
-
 
 // == post requests ==
 // new account request
@@ -212,7 +231,7 @@ app.post('/logout', (req, res) => {
 
 
 // New url request
-app.post('/urls/new', (req, res) => {
+app.post('/urls', (req, res) => {
   // new url permissions
   const userID = req.session.user_id;
   if (isForbidden(userID, users)) return res.sendStatus(403);
@@ -237,8 +256,8 @@ app.post('/urls/:id', (req, res) => {
   // edit permissions
   const userID = req.session.user_id;
   const shortURL = urlDatabase[req.params.id];
-  if (isForbidden(userID, users)) return res.sendStatus(403);
-  if (userID !== shortURL.userID) return res.sendStatus(403);
+  if (isForbidden(userID, users, shortURL)) return res.sendStatus(403);
+  // if (userID !== shortURL.userID) return res.sendStatus(403);
 
   // edit error handling
   const longURL = autofillHttpPrefix(req.body.longURL);
@@ -259,8 +278,8 @@ app.post('/urls/:id/delete', (req, res) => {
   // delete permissions
   const userID = req.session.user_id;
   const shortURL = urlDatabase[req.params.id];
-  if (isForbidden(userID, users)) return res.sendStatus(403);
-  if (userID !== shortURL.userID) return res.sendStatus(403);
+  if (isForbidden(userID, users, shortURL)) return res.sendStatus(403);
+  // if (userID !== shortURL.userID) return res.sendStatus(403);
 
   // delete success
   delete urlDatabase[shortURL.id];
