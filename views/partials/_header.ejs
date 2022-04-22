@@ -18,9 +18,9 @@
         <a href="/login"><button type="button"class="btn btn-dark" style="margin-right: 1em">Login</button></a>
         <a href="/register"><button type="button" class="btn btn-primary" style="margin-right: 1em">Register</button></a>
         <% } else { %>
+          <a href="/urls"><span class="navbar-text text-dark" style="margin-right: 1em;"><strong><%= user.email %></strong></span></a>
           <form type="button" class="form-inline" method="POST" action="/logout">
-            <span class="navbar-text text-dark" style="margin-right: 1em;"><strong><%= user.email %></strong></span>
-            <button class="btn btn-light" >Logout</button>
+            <button class="btn btn-light">Logout</button>
           </form>
         <% } %>
       </div>
