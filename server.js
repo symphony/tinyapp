@@ -88,7 +88,7 @@ app.get('/urls', (req, res) => {
 
 
 // New url page
-app.get("/urls/new", (req, res) => {
+app.get('/urls/new', (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
     sendAlert(res, 'No Access', 'warning');
@@ -160,15 +160,17 @@ app.get('/login', (req, res) => {
 
 
 // 404
-app.get('/not_found', (req, res) => {
-  const user = users[req.session.user_id];
-  res.render('/not_found', { user });
+app.get('/404', (req, res) => {
+  const templateVars = { user: users[req.session.user_id] };
+  res.render('404', templateVars);
 });
+
 
 // Catch all
 app.get('/*', (req, res) => {
-  res.redirect('/not_found');
+  res.redirect('/404');
 });
+
 
 // == post requests ==
 // new account request
