@@ -112,7 +112,7 @@ app.get('/urls/:id', (req, res) => {
     sendAlert(res, 'No Access', 'warning');
     return res.redirect('/urls');
   };
-  if (user.id !== shortURL.userID) return res.redirect('/urls', 401); // user doesn't own short url
+  if (user.id !== shortURL.userID) return res.redirect('/urls', 401);
   const templateVars = {
     user,
     shortURL,
@@ -160,15 +160,22 @@ app.get('/login', (req, res) => {
 
 
 // 404
-app.get('/404', (req, res) => {
-  const templateVars = { user: users[req.session.user_id] };
-  res.render('404', templateVars);
+app.get('/error', (req, res) => {
+  const user = users[req.session.user_id];
+  res.status(404).render('error', { user });
 });
 
+app.get('/url', (req, res) => {
+  res.redirect('/urls');
+});
+
+app.get('/new', (req, res) => {
+  res.redirect('/urls/new');
+});
 
 // Catch all
 app.get('/*', (req, res) => {
-  res.redirect('/404');
+  res.redirect('/error');
 });
 
 
