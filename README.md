@@ -30,7 +30,7 @@ Main Features
 * `Share URLs` - Short URLs are usuable by anyone with the link
 * `Secure Registration` - Passwords are securely stored via one-way hashing
 * `Encrypted Session` - Cookie IDs are unique per session
-* `Dark Page Design` - Easier on the eyes
+* `Dark App Design` - Easier on the eyes
 
 ---
 ### Dependencies

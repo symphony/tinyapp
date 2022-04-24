@@ -1,3 +1,8 @@
+/**
+* Uses recursion to generate unique ID consisting of any lower or upper case characters, and numbers 0-9.
+* Default length is 6 characters.
+* Throws error if not possible.
+*/
 const generateUniqueId = (database, length = 6, attempts = 30) => {
   const pool = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
   let newId = '';
@@ -6,29 +11,31 @@ const generateUniqueId = (database, length = 6, attempts = 30) => {
     newId += Math.random() > 0.5 ? pool[ranIndex].toUpperCase() : pool[ranIndex];
   }
 
-  // uses recursion to find unique id
-  if (attempts <= 0) throw TypeError("All unique IDs exhausted. Try longer ID length.");
+  if (attempts <= 0) throw TypeError("All unique IDs exhausted. Try longer ID length."); // manual failsafe
   return Object.keys(database).includes(newId) ? generateUniqueId(database, length, attempts - 1) : newId;
 };
 
-// not a catch all, but helps with some improper url submissions
+// Not a catch all, but helps with some improper url submissions
+/** Checks if submission includes http(s):// prefix and adds it if it doesn't */
 const autofillHttpPrefix = (longURL) => {
-  const trimmedUrl = longURL.trim();
-  if (!trimmedUrl) return null;
-  return trimmedUrl.includes('://') ? trimmedUrl : 'https://' + trimmedUrl;
+  const newUrl = longURL.trim();
+  if (!newUrl) return null;
+  return newUrl.includes('://') ? newUrl : 'https://' + newUrl;
 };
 
-// uses cookies to trigger alerts. will replace with non cookie version eventually
+/** Uses cookies to trigger alerts. Will replace with non cookie version eventually.  */
 const sendAlert = (res, message = '', style = 'info') => {
   res.cookie('alertMsg', message);
   res.cookie('alertStyle', style);
 };
 
+/** Clears cookies used to send alert. */
 const clearAlert = (res) => {
   res.clearCookie('alertMsg');
   res.clearCookie('alertStyle');
 };
 
+/** Adds a new user to the database. */
 const registerNewUser = (userDatabase, email, password) => {
   const id = generateUniqueId(userDatabase);
   userDatabase[id] = {
@@ -38,11 +45,16 @@ const registerNewUser = (userDatabase, email, password) => {
   };
 };
 
-// prevents use of improper form submission via cache or command line
+/**
+ * Prevents use of improper form submission via cache or curl/postman.
+ * @param {object} [shortURL] optional parameter needed for PUT/DELETE requests
+ */
 const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] || (shortURL ? userID !== shortURL.userID : false);
 
-const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find(user => user.email === email);
+/** @returns {object?} User object if found otherwise null */
+const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find(user => user.email === email) || null;
 
+/** @returns {object} New object with matching URLs or empty object if none found */
 const getUserUrls = (userID, urlDatabase) => {
   const userUrls = {};
   for (const key in urlDatabase) {

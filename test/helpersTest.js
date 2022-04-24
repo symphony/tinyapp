@@ -1,5 +1,5 @@
 const { assert, expect } = require('chai');
-const { getUserByEmail, getUserUrls } = require('../helpers.js');
+const { getUserByEmail, getUserUrls, isForbidden } = require('../helpers.js');
 
 const testUsers = {
   "userRandomID": {
@@ -34,9 +34,9 @@ describe('getUserByEmail', function() {
     const expectedUserID = "userRandomID";
     assert(user, expectedUserID);
   }),
-  it('should return undefined if not found', function() {
+  it('should return null if not found', function() {
     const user = getUserByEmail("not@realemail", testUsers);
-    assert.isUndefined(user);
+    assert.isNull(user);
   });
 });
 
@@ -47,5 +47,21 @@ describe('getUserUrls', () => {
       "9sm5xK": { id: '9sm5xK', longURL: 'http://www.google.com', userID: 'user2RandomID' }};
     expect(usersUrls).to.eql(expected);
     expect(getUserUrls("userRandomID", testDatabase)).to.eql({});
+  });
+});
+
+describe('isForbidden', () => {
+  const shortURL = testDatabase['9sm5xK'];
+  it('returns true when a non registered user makes a POST request', () => {
+    assert.isTrue(isForbidden('not registered', testUsers));
+  }),
+  it('returns false when a registered user makes a POST request', () => {
+    assert.isFalse(isForbidden('userRandomID', testUsers));
+  }),
+  it('returns true when user makes PUT/DELETE request on a URL they don\'t own', () => {
+    assert.isTrue(isForbidden('userRandomID', testUsers, shortURL));
+  }),
+  it('returns false when user makes PUT/DELETE request on their own URL', () => {
+    assert.isFalse(isForbidden('user2RandomID', testUsers, shortURL));
   });
 });
