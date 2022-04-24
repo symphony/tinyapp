@@ -16,7 +16,7 @@
         </div>
         <div class="card-footer text-muted">
           <h4 class="card-text m-2">Update destination for <%= shortURL.id %> </h4>
-          <form class="form-group form-inline" action="/urls/<%= shortURL.id %>" method="POST">
+          <form class="form-group form-inline" method="POST" action="/urls/<%= shortURL.id %>?_method=PUT" >
           <div class="form-group m-auto">
             <h5 for="longURL" class= "m-auto" >New URL:</h5>
             <input class="form-control" type="text" name="longURL" placeholder="<%= shortURL.longURL.replace(/(^\w+:|^)\/\//, '') %>" style="width: 300px; margin: 1em">

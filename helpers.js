@@ -38,7 +38,7 @@ const registerNewUser = (userDatabase, email, password) => {
   };
 };
 
-// prevents use of form submission via cache or command line
+// prevents use of improper form submission via cache or command line
 const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] || (shortURL ? userID !== shortURL.userID : false);
 
 const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find(user => user.email === email);

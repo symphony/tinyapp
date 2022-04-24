@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 const bcrypt = require('bcryptjs');
 
 // == helper functions ==
@@ -55,6 +56,7 @@ app.use(cookieSession({
   name: 'session',
   keys: ['topsecretstring'],
 }));
+app.use(methodOverride('_method'));
 
 
 // == get routing ==
@@ -261,12 +263,11 @@ app.post('/urls', (req, res) => {
 
 
 // Edit url
-app.post('/urls/:id', (req, res) => {
+app.put('/urls/:id', (req, res) => {
   // edit permissions
   const userID = req.session.user_id;
   const shortURL = urlDatabase[req.params.id];
   if (isForbidden(userID, users, shortURL)) return res.sendStatus(403);
-  // if (userID !== shortURL.userID) return res.sendStatus(403);
 
   // edit error handling
   const longURL = autofillHttpPrefix(req.body.longURL);
@@ -283,12 +284,11 @@ app.post('/urls/:id', (req, res) => {
 
 
 // Delete url
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id', (req, res) => {
   // delete permissions
   const userID = req.session.user_id;
   const shortURL = urlDatabase[req.params.id];
   if (isForbidden(userID, users, shortURL)) return res.sendStatus(403);
-  // if (userID !== shortURL.userID) return res.sendStatus(403);
 
   // delete success
   delete urlDatabase[shortURL.id];
