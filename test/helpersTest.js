@@ -41,7 +41,7 @@ describe('getUserByEmail', function() {
 });
 
 describe('getUserUrls', () => {
-  it('should return urls with matching userid', () => {
+  it('should return object of urls with matching userid', () => {
     const usersUrls = getUserUrls("user2RandomID", testDatabase);
     const expected =   {"b2xVn2": { id: 'b2xVn2', longURL: 'http://www.lighthouselabs.ca', userID: 'user2RandomID' },
       "9sm5xK": { id: '9sm5xK', longURL: 'http://www.google.com', userID: 'user2RandomID' }};

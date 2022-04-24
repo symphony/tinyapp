@@ -39,7 +39,9 @@ Main Features
 * `bcryptjs 2.4.3`
 * `cookie-parser 1.4.6`
 * `cookie-session 2.0.0`
+* `method-override 3.0.0`
 * `@forevolve/bootstrap-dark 2.1.0`
+
 
 ### Dev Dependencies
 * `chai 4.3.6`
