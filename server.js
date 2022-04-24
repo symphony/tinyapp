@@ -50,7 +50,7 @@ app.set('view engine', 'ejs');
 // == middleware ==
 app.use("/styles", express.static(`${__dirname}/styles/`));
 app.use(express.urlencoded({extended: false}));
-app.use(cookieParser()); // needed for alerts (will update to use express flashes eventually)
+app.use(cookieParser()); // needed for alerts (will update to use flash middleware eventually)
 app.use(cookieSession({
   name: 'session',
   keys: ['topsecretstring'],
@@ -58,7 +58,7 @@ app.use(cookieSession({
 app.use(methodOverride('_method'));
 
 
-// == get routing ==
+// == get request routing ==
 // homepage
 app.get('/', (req, res) => {
   const user = users[req.session.user_id];
@@ -88,7 +88,7 @@ app.get('/urls', (req, res) => {
 });
 
 
-// New url page
+// new url page
 app.get('/urls/new', (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
@@ -113,7 +113,7 @@ app.get('/urls/:id', (req, res) => {
     sendAlert(res, 'No Access', 'warning');
     return res.redirect('/urls');
   };
-  if (user.id !== shortURL.userID) return res.redirect('/urls', 401);
+  if (user.id !== shortURL.userID) return res.redirect(401, '/urls');
   const templateVars = {
     user,
     shortURL,
@@ -160,6 +160,12 @@ app.get('/register', (req, res) => {
 });
 
 
+// 404
+app.get('/error', (req, res) => {
+  const user = users[req.session.user_id];
+  res.status(404).render('error', { user });
+});
+
 // redirections
 app.get('/url', (req, res) => {
   res.redirect('/urls');
@@ -167,12 +173,6 @@ app.get('/url', (req, res) => {
 
 app.get('/new', (req, res) => {
   res.redirect('/urls/new');
-});
-
-// 404
-app.get('/error', (req, res) => {
-  const user = users[req.session.user_id];
-  res.status(404).render('error', { user });
 });
 
 // Catch all

@@ -15,16 +15,16 @@ const generateUniqueId = (database, length = 6, attempts = 30) => {
   return Object.keys(database).includes(newId) ? generateUniqueId(database, length, attempts - 1) : newId;
 };
 
-// Not a catch all, but helps with some improper url submissions
 /** Checks if submission includes http(s):// prefix and adds it if it doesn't */
+// Not a catch all, but helps with some improper url submissions
 const autofillHttpPrefix = (longURL) => {
   const newUrl = longURL.trim();
   if (!newUrl) return null;
   return newUrl.includes('://') ? newUrl : 'https://' + newUrl;
 };
 
-/** Uses cookies to trigger alerts. Will replace with non cookie version eventually.  */
-const sendAlert = (res, message = '', style = 'info') => {
+/** Uses cookies to trigger alerts. Will replace with non cookie version eventually. */
+const sendAlert = (res, message, style = 'info') => {
   res.cookie('alertMsg', message);
   res.cookie('alertStyle', style);
 };
@@ -35,7 +35,7 @@ const clearAlert = (res) => {
   res.clearCookie('alertStyle');
 };
 
-/** Adds a new user to the database. */
+/** Adds a new user to the database. Doesn't return a value. */
 const registerNewUser = (userDatabase, email, password) => {
   const id = generateUniqueId(userDatabase);
   userDatabase[id] = {
