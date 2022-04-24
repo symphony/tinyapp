@@ -19,14 +19,13 @@ const {
 
 // == our database ==
 const users = {
-  // used for testing only (delete before deploying)
+  // account used for testing only (delete before deploying)
   admin: {
     id: 'admin',
     email: 'admin',
     password: '$2a$10$1iRy0u0g0yXrwChQktRNb.XtkiKb2csrShY2k9Rz8B2DUUjaaVkqW'
   },
 };
-
 
 const urlDatabase = {
   "b2xVn2": {
@@ -73,7 +72,7 @@ app.get('/', (req, res) => {
 });
 
 
-// protected page
+// user dashboard
 app.get('/urls', (req, res) => {
   const user = users[req.session.user_id];
   if (!user) return res.redirect('/login');
@@ -137,18 +136,6 @@ app.get('/u/:id', (req, res) => {
 });
 
 
-// register page
-app.get('/register', (req, res) => {
-  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
-  const templateVars = {
-    alertMsg: req.cookies?.alertMsg,
-    alertStyle: req.cookies?.alertStyle
-  };
-  clearAlert(res);
-  res.render('register', templateVars);
-});
-
-
 // login page
 app.get('/login', (req, res) => {
   if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
@@ -161,6 +148,19 @@ app.get('/login', (req, res) => {
 });
 
 
+// register page
+app.get('/register', (req, res) => {
+  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
+  const templateVars = {
+    alertMsg: req.cookies?.alertMsg,
+    alertStyle: req.cookies?.alertStyle
+  };
+  clearAlert(res);
+  res.render('register', templateVars);
+});
+
+
+// redirections
 app.get('/url', (req, res) => {
   res.redirect('/urls');
 });
@@ -182,6 +182,30 @@ app.get('/*', (req, res) => {
 
 
 // == post requests ==
+// login request
+app.post('/login', (req, res) => {
+  const email = req.body.email.trim();
+  const password = req.body.password;
+
+  // login error handling
+  if (!email || !password) {
+    sendAlert(res, 'Login failed', 'danger');
+    return res.redirect('/login');
+  }
+
+  const user = getUserByEmail(email, users);
+  if (!user || !bcrypt.compareSync(password, user.password)) {
+    sendAlert(res, 'Incorrect Login info', 'danger');
+    return res.redirect('/login');
+  }
+
+  // login success
+  req.session.user_id = user.id;
+  sendAlert(res, 'Signed in!');
+  res.redirect('/urls');
+});
+
+
 // new account request
 app.post('/register', (req, res) => {
   const email = req.body.email.trim();
@@ -206,30 +230,6 @@ app.post('/register', (req, res) => {
   registerNewUser(users, email, hashedPassword);
   sendAlert(res, 'Successfully Registered!');
   res.redirect('/login');
-});
-
-
-// login request
-app.post('/login', (req, res) => {
-  const email = req.body.email.trim();
-  const password = req.body.password;
-
-  // login error handling
-  if (!email || !password) {
-    sendAlert(res, 'Login failed', 'danger');
-    return res.redirect('/login');
-  }
-
-  const user = getUserByEmail(email, users);
-  if (!user || !bcrypt.compareSync(password, user.password)) {
-    sendAlert(res, 'Incorrect Login info', 'danger');
-    return res.redirect('/login');
-  }
-
-  // login success
-  req.session.user_id = user.id;
-  sendAlert(res, 'Signed in!');
-  res.redirect('/urls');
 });
 
 
@@ -262,7 +262,7 @@ app.post('/urls', (req, res) => {
 });
 
 
-// Edit url
+// Edit url request
 app.put('/urls/:id', (req, res) => {
   // edit permissions
   const userID = req.session.user_id;
@@ -283,7 +283,7 @@ app.put('/urls/:id', (req, res) => {
 });
 
 
-// Delete url
+// Delete url request
 app.delete('/urls/:id', (req, res) => {
   // delete permissions
   const userID = req.session.user_id;
