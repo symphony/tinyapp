@@ -20,6 +20,7 @@ const {
 // == our database ==
 const users = {
   // account used for testing only (delete before deploying)
+  // can be used with email 'admin' and password 'admin'
   admin: {
     id: 'admin',
     email: 'admin',

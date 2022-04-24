@@ -16,8 +16,6 @@ Current version: 1.1.0
 * `Encrypted Session` - Cookie IDs are unique per session
 * `Dark App Design` - Easier on the eyes
 
----
-
 ## Usage
 
 **Clone or Download the Project**
@@ -26,19 +24,25 @@ Current version: 1.1.0
 
 **Install Dependencies:**
 
-`npm install` (in project folder)
+`cd tinyapp`
+
+`npm install`
 
 **Run the Server:**
 
 `npm start`
 
-**Visit the API:**
+**Visit the API in Your Browser:**
 
 `http://localhost:3000` (default port is 3000)
 
 **Stop the Server**
 
-`CTRL + C` in the terminal (see below for more information)
+Use hotkey `CTRL+C` in the terminal (see below for more options)
+
+**Uninstall**
+
+To uninstall, simply delete the project folder `/tinyapp/` from your computer.
 
 ---
 ### Dependencies
@@ -70,13 +74,10 @@ Current version: 1.1.0
 
 ### Troubleshooting / Notes for devs
 
- - Server can be run with nodemon by using:
-  `npm run dev`
- - If you need to manually kill the server it can be found using:
-  `lsof -i tcp`
- - Find the running service with the matching port number (usually 3000), then use:
-  `kill <PID>`
- - Mocha tests for helper functions can be run using:
-  `npm test`
+ - Use email `admin` and password `admin` to use built in account
+ - Server can be run with nodemon by using: `npm run dev`
+ - Mocha tests for helper functions can be run using: `npm test`
+ - If you need to force close the server it can be found using: `lsof -i tcp`
+ - Find the running service with the matching port number (usually 3000). Then use: `kill <PID>`
 
 *Thanks for trying my app!*
