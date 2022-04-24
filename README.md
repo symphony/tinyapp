@@ -1,10 +1,9 @@
 # TinyApp
 
-URL Shortener API built using Express Node.js.
-Current version: 1.1.0
+URL Shortener API built using Express Node.js  
+*v1.1.0*
 
-*Disclaimer: This app was built for educational purposes only.*
-*It currently only runs locally and stores all data in temporary storage. Any submitted user information will be lost upon stopping the server.*
+*Disclaimer: This app was built for educational purposes only. It currently only runs locally and stores all data in temporary storage. Any submitted user information will be lost upon stopping the server.*
 
 ## Features
 
@@ -13,20 +12,18 @@ Current version: 1.1.0
 * `Edit URLs` - Delete or update your Short URLs
 * `Share URLs` - Short URLs are usuable by anyone with the link
 * `Secure Registration` - Passwords are securely stored via one-way hashing
-* `Encrypted Session` - Cookie IDs are unique per session
+* `Encrypted Session` - Cookie IDs are unique and personal information is never shared
 * `Dark App Design` - Easier on the eyes
 
 ## Usage
 
 **Clone or Download the Project**
 
-`git clone git@github.com:symphony/tinyapp.git`
+`git clone git@github.com:symphony/tinyapp.git && cd tinyapp`
 
 **Install Dependencies:**
 
-`cd tinyapp`
-
-`npm install`
+`npm install` (inside the project folder)
 
 **Run the Server:**
 
@@ -38,7 +35,7 @@ Current version: 1.1.0
 
 **Stop the Server**
 
-Use hotkey `CTRL+C` in the terminal (see below for more options)
+Use hotkey `CTRL + C` in the terminal (see below for more options)
 
 **Uninstall**
 
@@ -75,9 +72,9 @@ To uninstall, simply delete the project folder `/tinyapp/` from your computer.
 ### Troubleshooting / Notes for devs
 
  - Use email `admin` and password `admin` to use built in account
- - Server can be run with nodemon by using: `npm run dev`
- - Mocha tests for helper functions can be run using: `npm test`
- - If you need to force close the server it can be found using: `lsof -i tcp`
- - Find the running service with the matching port number (usually 3000). Then use: `kill <PID>`
+ - Mocha tests for helper functions can be run using `npm test`
+ - Server can be run with nodemon by using `npm run dev`
+ - If you need to force close the server it can be found using `lsof -i tcp`
+ - Find the running service with the matching port number (usually 3000), then enter `kill <PID>`
 
 *Thanks for trying my app!*
