@@ -1,9 +1,9 @@
 # TinyApp
+<sub>*version 1.1.0*</sub>
 
 URL Shortener API built using Express Node.js  
-*v1.1.0*
 
-*Disclaimer: This app was built for educational purposes only. It currently only runs locally and stores all data in temporary storage. Any submitted user information will be lost upon stopping the server.*
+<sub>*Disclaimer - This app was built for educational purposes only. It currently only runs locally and stores all data in temporary memory. Any submitted user information will be lost upon stopping the server.*</sub>
 
 ## Features
 
@@ -11,8 +11,8 @@ URL Shortener API built using Express Node.js
 * `User Account` - Save your Short URLs to an account
 * `Edit URLs` - Delete or update your Short URLs
 * `Share URLs` - Short URLs are usuable by anyone with the link
-* `Secure Registration` - Passwords are securely stored via one-way hashing
-* `Encrypted Session` - Cookie IDs are unique and personal information is never shared
+* `Secure Registration` - Passwords are securely stored via [one-way hashing](https://en.wikipedia.org/wiki/Cryptographic_hash_function)
+* `Encrypted Sessions` - Cookie IDs are unique and unidentifiable - personal information is never shared
 * `Dark App Design` - Easier on the eyes
 
 ## Usage
@@ -43,19 +43,19 @@ To uninstall, simply delete the project folder `/tinyapp/` from your computer.
 
 ---
 ### Dependencies
-* `express 4.17`
-* `ejs 3.1.6`
-* `bcryptjs 2.4.3`
-* `cookie-parser 1.4.6`
-* `cookie-session 2.0.0`
-* `method-override 3.0.0`
-* `@forevolve/bootstrap-dark 2.1.0`
+* [`express 4.17`](https://www.npmjs.com/package/express)
+* [`ejs 3.1.6`](https://www.npmjs.com/package/ejs)
+* [`bcryptjs 2.4.3`](https://www.npmjs.com/package/bcryptjs)
+* [`cookie-parser 1.4.6`](https://www.npmjs.com/package/cookie-parser)
+* [`cookie-session 2.0.0`](https://www.npmjs.com/package/cookie-session)
+* [`method-override 3.0.0`](https://www.npmjs.com/package/method-override)
+* [`@forevolve/bootstrap-dark 2.1.0`](https://www.npmjs.com/package/@forevolve/bootstrap-dark)
 
 
 ### Dev Dependencies
-* `chai 4.3.6`
-* `mocha 9.2.2`
-* `nodemon 2.0.1`
+* [`chai 4.3.6`](https://www.npmjs.com/package/chai)
+* [`mocha 9.2.2`](https://www.npmjs.com/package/mocha)
+* [`nodemon 2.0.1`](https://www.npmjs.com/package/nodemon)
 
 ---
 

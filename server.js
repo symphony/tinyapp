@@ -17,9 +17,9 @@ const {
   } = require('./helpers');
 
 
-// == our database ==
+// == our databases ==
 const users = {
-  // account used for testing only (delete before deploying)
+  // account used for testing only
   // can be used with email 'admin' and password 'admin'
   admin: {
     id: 'admin',
