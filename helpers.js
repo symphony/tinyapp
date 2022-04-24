@@ -44,10 +44,13 @@ const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] ||
 const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find(user => user.email === email);
 
 const getUserUrls = (userID, urlDatabase) => {
-  const matchingUrls = Object.keys(urlDatabase).filter(urlID => urlDatabase[urlID].userID === userID);
-  return matchingUrls.reduce((newObj, key) => {
-    return {...newObj, [key]: urlDatabase[key]};
-  }, {});
+  const userUrls = {};
+  for (const key in urlDatabase) {
+    if (urlDatabase[key].userID === userID) {
+      userUrls[key] = urlDatabase[key];
+    }
+  }
+  return userUrls;
 };
 
 module.exports = {

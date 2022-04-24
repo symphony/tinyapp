@@ -26,11 +26,11 @@ Main Features
 
 * `Short URL` - Convert any long URL into a Short URL
 * `User Account` - Save your Short URLs to an account
-* `Edit URLs` - Delete or update your Short URL destination
+* `Edit URLs` - Delete or update your Short URLs
 * `Share URLs` - Short URLs are usuable by anyone with the link
 * `Secure Registration` - Passwords are securely stored via one-way hashing
 * `Encrypted Session` - Cookie IDs are unique per session
-* `Dark Mode` - Easier on the eyes
+* `Dark Page Design` - Easier on the eyes
 
 ---
 ### Dependencies
