@@ -17,28 +17,43 @@ const {
   } = require('./helpers');
 
 
+// == classes ==
+class User {
+  constructor(id, email, password) {
+    this.id = id,
+    this.email = email,
+    this.password = password
+  }
+};
+
+class ShortURL {
+  constructor(id, longURL, userID) {
+    this.id = id,
+    this.longURL = longURL,
+    this.userID = userID,
+    this.visits = []
+  }
+  get totalVisits() {
+    return this.visits.length;
+  }
+  get uniqueVisitors() {
+    return Object.keys(this.visits.reduce((uniques, {visitor_id}) => uniques[visitor_id], {})).length;
+  }
+  addVisit(timestamp, visitor_id) {
+    this.visits.push({visitor_id, timestamp})
+  }
+};
+
 // == our databases ==
 const users = {
   // account used for testing only
   // can be used with email 'admin' and password 'admin'
-  admin: {
-    id: 'admin',
-    email: 'admin',
-    password: '$2a$10$1iRy0u0g0yXrwChQktRNb.XtkiKb2csrShY2k9Rz8B2DUUjaaVkqW'
-  },
+  admin: new User('admin', 'admin', '$2a$10$1iRy0u0g0yXrwChQktRNb.XtkiKb2csrShY2k9Rz8B2DUUjaaVkqW')
 };
 
 const urlDatabase = {
-  "b2xVn2": {
-    id: 'b2xVn2',
-    longURL: 'http://www.lighthouselabs.ca',
-    userID: 'admin'
-  },
-  "9sm5xK": {
-    id: '9sm5xK',
-    longURL: 'http://www.google.com',
-    userID: 'admin'
-  }
+  'b2xVn2': new ShortURL('b2xVn2', 'http://www.lighthouselabs.ca', 'admin'),
+  '9sm5xK': new ShortURL('9sm5xK', 'http://www.google.com', 'admin')
 };
 
 
@@ -126,17 +141,6 @@ app.get('/urls/:id', (req, res) => {
 });
 
 
-// actual shortURL redirection
-app.get('/u/:id', (req, res) => {
-  const longURL = urlDatabase[req.params.id]?.longURL;
-  if (!longURL) {
-    sendAlert(res, 'No URL with that ID', 'warning');
-    return res.redirect('/');
-  };
-  res.redirect(longURL);
-});
-
-
 // login page
 app.get('/login', (req, res) => {
   if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
@@ -161,13 +165,25 @@ app.get('/register', (req, res) => {
 });
 
 
+// actual shortURL redirection
+app.get('/u/:id', (req, res) => {
+  const longURL = urlDatabase[req.params.id]?.longURL;
+  if (!longURL) {
+    sendAlert(res, 'No URL with that ID', 'warning');
+    return res.redirect('/');
+  };
+  res.redirect(longURL);
+});
+
+
 // 404
 app.get('/error', (req, res) => {
   const user = users[req.session.user_id];
   res.status(404).render('error', { user });
 });
 
-// redirections
+
+// convenience redirections
 app.get('/url', (req, res) => {
   res.redirect('/urls');
 });
