@@ -3,7 +3,7 @@
 * Default length is 6 characters.
 * Throws error if not possible.
 */
-const generateUniqueId = (database, length = 6, attempts = 30) => {
+const generateUniqueId = (database, length = 6, attempts = 100) => {
   const pool = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
   let newId = '';
   for (let i = 0; i < length; i++) {
@@ -11,7 +11,7 @@ const generateUniqueId = (database, length = 6, attempts = 30) => {
     newId += Math.random() > 0.5 ? pool[ranIndex].toUpperCase() : pool[ranIndex];
   }
 
-  if (attempts <= 0) throw TypeError("All unique IDs exhausted. Try longer ID length."); // manual failsafe
+  if (attempts <= 0) throw TypeError("All unique IDs exhausted. Try longer ID length."); // failsafe
   return Object.keys(database).includes(newId) ? generateUniqueId(database, length, attempts - 1) : newId;
 };
 
@@ -23,7 +23,7 @@ const autofillHttpPrefix = (longURL) => {
   return newUrl.includes('://') ? newUrl : 'https://' + newUrl;
 };
 
-/** Uses cookies to trigger alerts. Will replace with non cookie version eventually. */
+/** Uses cookies to trigger alerts. Will replace with middleware alternative eventually. */
 const sendAlert = (res, message, style = 'info') => {
   res.cookie('alertMsg', message);
   res.cookie('alertStyle', style);
@@ -49,7 +49,7 @@ const registerNewUser = (userDatabase, email, password) => {
  * Prevents use of improper form submission via cache or curl/postman.
  * @param {object} [shortURL] optional parameter needed for PUT/DELETE requests
  */
-const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] || (shortURL ? userID !== shortURL.userID : false);
+const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] || (shortURL ? userID !== shortURL.ownerID : false);
 
 /** @returns {object?} User object if found otherwise null */
 const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find(user => user.email === email) || null;
@@ -58,7 +58,7 @@ const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find
 const getUserUrls = (userID, urlDatabase) => {
   const userUrls = {};
   for (const key in urlDatabase) {
-    if (urlDatabase[key].userID === userID) {
+    if (urlDatabase[key].ownerID === userID) {
       userUrls[key] = urlDatabase[key];
     }
   }

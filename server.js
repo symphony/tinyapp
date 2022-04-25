@@ -14,35 +14,34 @@ const {
   isForbidden,
   getUserByEmail,
   getUserUrls,
-  } = require('./helpers');
-
+} = require('./helpers');
 
 // == classes ==
 class User {
   constructor(id, email, password) {
-    this.id = id,
-    this.email = email,
-    this.password = password
+    this.id = id;
+    this.email = email;
+    this.password = password;
   }
-};
+}
 
 class ShortURL {
   constructor(id, longURL, userID) {
-    this.id = id,
-    this.longURL = longURL,
-    this.userID = userID,
-    this.visits = []
+    this.id = id;
+    this.longURL = longURL;
+    this.ownerID = userID;
+    this.visits = [];
   }
-  get totalVisits() {
+  get hits() {
     return this.visits.length;
   }
   get uniqueVisitors() {
     return Object.keys(this.visits.reduce((uniques, {visitor_id}) => uniques[visitor_id], {})).length;
   }
   addVisit(timestamp, visitor_id) {
-    this.visits.push({visitor_id, timestamp})
+    this.visits.push({visitor_id, timestamp});
   }
-};
+}
 
 // == our databases ==
 const users = {
@@ -66,11 +65,8 @@ app.set('view engine', 'ejs');
 // == middleware ==
 app.use("/styles", express.static(`${__dirname}/styles/`));
 app.use(express.urlencoded({extended: false}));
-app.use(cookieParser()); // needed for alerts (will update to use flash middleware eventually)
-app.use(cookieSession({
-  name: 'session',
-  keys: ['topsecretstring'],
-}));
+app.use(cookieParser()); // needed for alerts for now
+app.use(cookieSession({ name: 'session', keys: ['top secret string'] }));
 app.use(methodOverride('_method'));
 
 
@@ -81,7 +77,7 @@ app.get('/', (req, res) => {
   if (user) return res.redirect('/urls');
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
-    alertStyle: req.cookies?.alertStyle
+    alertStyle: req.cookies?.alertStyle,
   };
   clearAlert(res);
   res.render('index', templateVars);
@@ -97,7 +93,7 @@ app.get('/urls', (req, res) => {
     user,
     urls,
     alertMsg: req.cookies?.alertMsg,
-    alertStyle: req.cookies?.alertStyle
+    alertStyle: req.cookies?.alertStyle,
   };
   clearAlert(res);
   res.render('urls_index', templateVars);
@@ -110,11 +106,11 @@ app.get('/urls/new', (req, res) => {
   if (!user) {
     sendAlert(res, 'No Access', 'warning');
     return res.redirect('/login');
-  };
+  }
   const templateVars = {
     user,
     alertMsg: req.cookies?.alertMsg,
-    alertStyle: req.cookies?.alertStyle
+    alertStyle: req.cookies?.alertStyle,
   };
   clearAlert(res);
   res.render("urls_new", templateVars);
@@ -128,13 +124,13 @@ app.get('/urls/:id', (req, res) => {
   if (!user || !shortURL) {
     sendAlert(res, 'No Access', 'warning');
     return res.redirect('/urls');
-  };
-  if (user.id !== shortURL.userID) return res.redirect(401, '/urls');
+  }
+  if (user.id !== shortURL.ownerID) return res.redirect(401, '/urls');
   const templateVars = {
     user,
     shortURL,
     alertMsg: req.cookies?.alertMsg,
-    alertStyle: req.cookies?.alertStyle
+    alertStyle: req.cookies?.alertStyle,
   };
   clearAlert(res);
   res.render('urls_edit', templateVars);
@@ -146,7 +142,7 @@ app.get('/login', (req, res) => {
   if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
-    alertStyle: req.cookies?.alertStyle
+    alertStyle: req.cookies?.alertStyle,
   };
   clearAlert(res);
   res.render('login', templateVars);
@@ -158,7 +154,7 @@ app.get('/register', (req, res) => {
   if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
-    alertStyle: req.cookies?.alertStyle
+    alertStyle: req.cookies?.alertStyle,
   };
   clearAlert(res);
   res.render('register', templateVars);
@@ -171,7 +167,7 @@ app.get('/u/:id', (req, res) => {
   if (!longURL) {
     sendAlert(res, 'No URL with that ID', 'warning');
     return res.redirect('/');
-  };
+  }
   res.redirect(longURL);
 });
 

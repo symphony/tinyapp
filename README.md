@@ -42,6 +42,17 @@ Use hotkey `CTRL + C` in the terminal (see below for more options)
 To uninstall, simply delete the project folder `/tinyapp/` from your computer.
 
 ---
+
+![Screenshot of TinyApp Homepage](docs/tiny1.png?raw=true "Homepage")
+
+![Screenshot of New URL](docs/tiny2.png?raw=true "New Short URL")
+
+![Screenshot of Dashboard](docs/tiny3.png?raw=true "User Dashboard")
+
+![Screenshot of Edit Page](docs/tiny4.png?raw=true "Edit Page")
+
+---
+
 ### Dependencies
 * [`express 4.17`](https://www.npmjs.com/package/express)
 * [`ejs 3.1.6`](https://www.npmjs.com/package/ejs)
@@ -56,18 +67,6 @@ To uninstall, simply delete the project folder `/tinyapp/` from your computer.
 * [`chai 4.3.6`](https://www.npmjs.com/package/chai)
 * [`mocha 9.2.2`](https://www.npmjs.com/package/mocha)
 * [`nodemon 2.0.1`](https://www.npmjs.com/package/nodemon)
-
----
-
-![Screenshot of TinyApp Homepage](docs/tiny1.png?raw=true "Homepage")
-
-![Screenshot of New URL](docs/tiny2.png?raw=true "New Short URL")
-
-![Screenshot of Dashboard](docs/tiny3.png?raw=true "User Dashboard")
-
-![Screenshot of Edit Page](docs/tiny4.png?raw=true "Edit Page")
-
----
 
 ### Troubleshooting / Notes for devs
 
