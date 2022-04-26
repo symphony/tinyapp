@@ -3,9 +3,14 @@
   <head>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="../styles/bootstrap-dark.min.css">
-    <!-- CSS override -->
-    <style> .card, .card-footer, .card-header, .table thead th, .table td { border: 0;} </style>
-    <style> .table { background-color: transparent; } </style>
+
+    <!-- CSS overrides -->
+    <style>
+    .card, .card-footer, .card-header, .table thead th, .table td { border: 0;}
+    .table { background-color: transparent; }
+    td { padding: 0.3em 0.75em; }
+    </style>
+
     <title>TinyApp - /u/<%= shortURL.id %></title>
   </head>
 
@@ -44,11 +49,11 @@
           <% let firstRow = true; %>
           <% for (const {visitorID, timestamp} of shortURL.visits.slice(0, 30)) { %>
             <tr>
-              <td style="padding: 0.3em 0.75em;"><%= visitorID %></td>
-              <td style="padding: 0.3em 0.75em;"><%= timestamp %></td>
+              <td><%= visitorID %></td>
+              <td><%= timestamp %></td>
               <% if (firstRow) { %>
-              <td style="padding: 0.3em 0.75em;"><strong><%= shortURL.hits %></strong></td>
-              <td style="padding: 0.3em 0.75em;"><strong><%= shortURL.uniqueVisitors %></strong></td>
+              <td><strong><%= shortURL.hits %></strong></td>
+              <td><strong><%= shortURL.uniqueVisitors %></strong></td>
               <% firstRow = false; } %>
             <% } %>
           </tr>
