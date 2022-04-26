@@ -14,6 +14,7 @@ URL Shortener API built using Express Node.js
 * `Secure Registration` - Passwords are securely stored via [one-way hashing](https://en.wikipedia.org/wiki/Cryptographic_hash_function)
 * `Encrypted Sessions` - Cookie IDs are unique and unidentifiable - personal information is never shared
 * `Dark App Design` - Easier on the eyes
+* `Analytics` - (new in v1.1.0) Tracks and shows analytics of ShortURLs - includes total hits and unique visitors count 
 
 ## Usage
 
@@ -49,7 +50,9 @@ To uninstall, simply delete the project folder `/tinyapp/` from your computer.
 
 ![Screenshot of Dashboard](docs/tiny3.png?raw=true "User Dashboard")
 
-![Screenshot of Edit Page](docs/tiny4.png?raw=true "Edit Page")
+![Screenshot of ShortURL Info Page](docs/tiny4.png?raw=true "ShortURL Info Page")
+
+![Screenshot of Analytics](docs/tiny5.png?raw=true "Analytics")
 
 ---
 
@@ -60,8 +63,8 @@ To uninstall, simply delete the project folder `/tinyapp/` from your computer.
 * [`cookie-parser 1.4.6`](https://www.npmjs.com/package/cookie-parser)
 * [`cookie-session 2.0.0`](https://www.npmjs.com/package/cookie-session)
 * [`method-override 3.0.0`](https://www.npmjs.com/package/method-override)
-* [`@forevolve/bootstrap-dark 2.1.0`](https://www.npmjs.com/package/@forevolve/bootstrap-dark)
 * [`date-fns 2.28.0`](https://www.npmjs.com/package/date-fns)
+* [`@forevolve/bootstrap-dark 2.1.0`](https://www.npmjs.com/package/@forevolve/bootstrap-dark)
 
 
 ### Dev Dependencies
