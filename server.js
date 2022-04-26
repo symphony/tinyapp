@@ -37,7 +37,6 @@ class ShortURL {
   }
   get uniqueVisitors() {
     const visitorIDs = Object.values(this.visits).map(({visitor_id}) => visitor_id);
-    console.log(visitorIDs);
     return new Set(visitorIDs).size;
   }
   addVisit(visitor_id, timestamp) {
@@ -183,7 +182,7 @@ app.get('/error', (req, res) => {
 });
 
 
-// convenience redirections
+// forgiveness redirections
 app.get('/url', (req, res) => {
   res.redirect('/urls');
 });
