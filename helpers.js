@@ -57,7 +57,7 @@ const getUserUrls = (userID, urlDatabase) => {
   return userUrls;
 };
 
-/** Checks if user already has a public ID via cookies and sets one if not. Stores new visit in ShortURL */
+/** Checks if user already has a public ID via cookies and sets one if not. Stores new visit in ShortURL. Doesn't return a value. */
 const trackVisit = (req, res, shortURL, publicIds) => {
   let visitor_id = req.cookies.visitor_id;
   if (!visitor_id) {
