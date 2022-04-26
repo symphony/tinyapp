@@ -285,17 +285,20 @@ app.put('/urls/:id', (req, res) => {
   // edit permissions
   const userID = req.session.userID;
   const shortURL = urlDatabase[req.params.id];
+  if (!shortURL) {
+    sendAlert(res, 'ShortURL no longer exists', 'danger');
+    return res.redirect('/urls/');
+  }
   if (isForbidden(userID, users, shortURL)) return res.sendStatus(403);
 
   // edit error handling
   const longURL = autofillHttpPrefix(req.body.longURL);
-  if (!shortURL || !longURL) {
+  if (!longURL) {
     sendAlert(res, 'Invalid URL', 'danger');
-    return res.redirect('/urls/' + shortURL?.id);
+    return res.redirect('/urls/' + shortURL.id);
   }
 
   // edit success
-  console.log(shortURL);
   shortURL.longURL = longURL;
   sendAlert(res, 'Updated ' + shortURL.id);
   res.redirect('/urls/' + shortURL.id);
@@ -307,6 +310,10 @@ app.delete('/urls/:id', (req, res) => {
   // delete permissions
   const userID = req.session.userID;
   const shortURL = urlDatabase[req.params.id];
+  if (!shortURL) {
+    sendAlert(res, 'ShortURL no longer exists', 'danger');
+    return res.redirect('/urls/');
+  }
   if (isForbidden(userID, users, shortURL)) return res.sendStatus(403);
 
   // delete success
