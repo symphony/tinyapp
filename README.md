@@ -61,6 +61,7 @@ To uninstall, simply delete the project folder `/tinyapp/` from your computer.
 * [`cookie-session 2.0.0`](https://www.npmjs.com/package/cookie-session)
 * [`method-override 3.0.0`](https://www.npmjs.com/package/method-override)
 * [`@forevolve/bootstrap-dark 2.1.0`](https://www.npmjs.com/package/@forevolve/bootstrap-dark)
+* [`date-fns 2.28.0`](https://www.npmjs.com/package/date-fns)
 
 
 ### Dev Dependencies

@@ -25,12 +25,13 @@
     "nodemon": "^2.0.15"
   },
   "dependencies": {
+    "@forevolve/bootstrap-dark": "^2.1.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",
+    "date-fns": "^2.28.0",
     "ejs": "^3.1.6",
     "express": "^4.17.3",
-    "method-override": "^3.0.0",
-    "@forevolve/bootstrap-dark": "^2.1.0"
+    "method-override": "^3.0.0"
   }
 }

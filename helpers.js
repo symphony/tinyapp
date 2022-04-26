@@ -1,3 +1,5 @@
+const { format } = require('date-fns');
+
 /**
 * Uses recursion to generate unique ID consisting of any lower or upper case characters, and numbers 0-9.
 * Default length is 6 characters.
@@ -35,16 +37,6 @@ const clearAlert = (res) => {
   res.clearCookie('alertStyle');
 };
 
-/** Adds a new user to the database. Doesn't return a value. */
-const registerNewUser = (userDatabase, email, password) => {
-  const id = generateUniqueId(userDatabase);
-  userDatabase[id] = {
-    id,
-    email,
-    password
-  };
-};
-
 /**
  * Prevents use of improper form submission via cache or curl/postman.
  * @param {object} [shortURL] optional parameter needed for PUT/DELETE requests
@@ -65,13 +57,24 @@ const getUserUrls = (userID, urlDatabase) => {
   return userUrls;
 };
 
+/** Checks if user already has a public ID via cookies and sets one if not. Stores new visit in ShortURL */
+const trackVisit = (req, res, shortURL, publicIds) => {
+  let visitor_id = req.cookies.visitor_id;
+  if (!visitor_id) {
+    visitor_id = generateUniqueId(publicIds);
+    res.cookie('visitor_id', visitor_id);
+  }
+  const timestamp = format(new Date(), 'MM/dd/yyyy HH:mm:ss');
+  shortURL.addVisit(visitor_id, timestamp);
+};
+
 module.exports = {
   generateUniqueId,
   autofillHttpPrefix,
   sendAlert,
   clearAlert,
-  registerNewUser,
   isForbidden,
   getUserByEmail,
   getUserUrls,
+  trackVisit,
 };
