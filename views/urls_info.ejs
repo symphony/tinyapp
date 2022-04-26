@@ -13,11 +13,11 @@
     <%- include('partials/_header') %>
     <div class="card text-center">
         <div class="card-body">
-          <h2 class="card-text">TinyURL: <a href="/u/<%= shortURL.id %>"><%= shortURL.id %></a></h2>
+          <h2 class="card-text">TinyURL - <a href="/u/<%= shortURL.id %>"><%= shortURL.id %></a></h2>
           <h5 class="card-title"><a href="<%= shortURL.longURL %>"><%= shortURL.longURL %></a></h5>
         </div>
         <div class="card-footer text-muted">
-          <h4 class="card-text m-2">Update destination for <%= shortURL.id %> </h4>
+          <h4 class="card-text m-2">Update destination for /u/<%= shortURL.id %> </h4>
           <form class="form-group form-inline" method="POST" action="/urls/<%= shortURL.id %>?_method=PUT" >
           <div class="form-group m-auto">
             <h5 for="longURL" class= "m-auto" >New URL:</h5>
@@ -32,23 +32,23 @@
         <thead class="card-header" style="font-size: 0.9rem;">
           <tr>
             <% if (shortURL.hits) { %>
-              <th scope="col" class="col-1">Visitor</th>
-              <th scope="col" class="col-3">Time Visited</th>
-              <th scope="col" class="col-1">Total Hits</th>
-              <th scope="col" class="col-3  ">Unique Visitors</th>
-              <% } %>
+              <th scope="col" class="col-1"><strong>Visitor</strong></th>
+              <th scope="col" class="col-3"><strong>Time Visited</strong></th>
+              <th scope="col" class="col-1"><strong>Total Hits</strong></th>
+              <th scope="col" class="col-3"><strong>Unique Visitors</strong></th>
+            <% } %>
               <th></th>
           </tr>
         </thead>
         <tbody>
           <% let firstRow = true; %>
-          <% for (const {visitor_id, timestamp} of shortURL.visits) { %>
+          <% for (const {visitorID, timestamp} of shortURL.visits.slice(0, 30)) { %>
             <tr>
-              <td style="padding: 0.3em 0.75em;"><%= visitor_id %></td>
+              <td style="padding: 0.3em 0.75em;"><%= visitorID %></td>
               <td style="padding: 0.3em 0.75em;"><%= timestamp %></td>
               <% if (firstRow) { %>
-              <td style="padding: 0.3em 0.75em;"> <%= shortURL.hits %> </td>
-              <td style="padding: 0.3em 0.75em;"> <%= shortURL.uniqueVisitors %> </td>
+              <td style="padding: 0.3em 0.75em;"><strong><%= shortURL.hits %></strong></td>
+              <td style="padding: 0.3em 0.75em;"><strong><%= shortURL.uniqueVisitors %></strong></td>
               <% firstRow = false; } %>
             <% } %>
           </tr>

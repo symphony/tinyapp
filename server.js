@@ -6,13 +6,13 @@ const bcrypt = require('bcryptjs');
 
 // == helper functions ==
 const {
-  generateUniqueId,
+  generateUniqueId: generateUniqueID,
   autofillHttpPrefix,
   sendAlert,
   clearAlert,
   isForbidden,
   getUserByEmail,
-  getUserUrls,
+  getUserURLs,
   trackVisit,
 } = require('./helpers');
 
@@ -36,11 +36,11 @@ class ShortURL {
     return this.visits.length;
   }
   get uniqueVisitors() {
-    const visitorIDs = Object.values(this.visits).map(({visitor_id}) => visitor_id);
+    const visitorIDs = Object.values(this.visits).map(({visitorID}) => visitorID);
     return new Set(visitorIDs).size;
   }
-  addVisit(visitor_id, timestamp) {
-    this.visits.push({visitor_id, timestamp});
+  addVisit(visitorID, timestamp) {
+    this.visits.unshift({visitorID, timestamp});
   }
 }
 
@@ -56,7 +56,8 @@ const urlDatabase = {
   '9sm5xK': new ShortURL('9sm5xK', 'http://www.google.com', 'admin')
 };
 
-const publicIds = {};
+const publicIDs = {};
+
 
 // == server config ==
 const app = express();
@@ -75,7 +76,7 @@ app.use(cookieSession({ name: 'session', keys: ['top secret string'] }));
 // == get request routing ==
 // homepage
 app.get('/', (req, res) => {
-  const user = users[req.session.user_id];
+  const user = users[req.session.userID];
   if (user) return res.redirect('/urls');
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
@@ -88,9 +89,9 @@ app.get('/', (req, res) => {
 
 // user dashboard
 app.get('/urls', (req, res) => {
-  const user = users[req.session.user_id];
+  const user = users[req.session.userID];
   if (!user) return res.redirect('/login');
-  const urls = getUserUrls(user?.id, urlDatabase);
+  const urls = getUserURLs(user?.id, urlDatabase);
   const templateVars = {
     user,
     urls,
@@ -104,7 +105,7 @@ app.get('/urls', (req, res) => {
 
 // new url page
 app.get('/urls/new', (req, res) => {
-  const user = users[req.session.user_id];
+  const user = users[req.session.userID];
   if (!user) {
     sendAlert(res, 'No Access', 'warning');
     return res.redirect('/login');
@@ -121,7 +122,7 @@ app.get('/urls/new', (req, res) => {
 
 // ShortURL's info page
 app.get('/urls/:id', (req, res) => {
-  const user = users[req.session.user_id];
+  const user = users[req.session.userID];
   const shortURL = urlDatabase[req.params.id];
   if (!user || !shortURL) {
     sendAlert(res, 'No Access', 'warning');
@@ -141,7 +142,7 @@ app.get('/urls/:id', (req, res) => {
 
 // login page
 app.get('/login', (req, res) => {
-  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
+  if (users[req.session.userID]) return res.redirect('/urls'); // user already logged in
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle,
@@ -153,7 +154,7 @@ app.get('/login', (req, res) => {
 
 // register page
 app.get('/register', (req, res) => {
-  if (users[req.session.user_id]) return res.redirect('/urls'); // user already logged in
+  if (users[req.session.userID]) return res.redirect('/urls'); // user already logged in
   const templateVars = {
     alertMsg: req.cookies?.alertMsg,
     alertStyle: req.cookies?.alertStyle,
@@ -170,14 +171,14 @@ app.get('/u/:id', (req, res) => {
     sendAlert(res, 'No URL with that ID', 'warning');
     return res.redirect('/');
   }
-  trackVisit(req, res, shortURL, publicIds);
+  trackVisit(req, res, shortURL, publicIDs);
   res.redirect(shortURL.longURL);
 });
 
 
 // 404
 app.get('/error', (req, res) => {
-  const user = users[req.session.user_id];
+  const user = users[req.session.userID];
   res.status(404).render('error', { user });
 });
 
@@ -216,7 +217,7 @@ app.post('/login', (req, res) => {
   }
 
   // login success
-  req.session.user_id = user.id;
+  req.session.userID = user.id;
   sendAlert(res, 'Signed in!');
   res.redirect('/urls');
 });
@@ -242,7 +243,7 @@ app.post('/register', (req, res) => {
   }
 
   // new account success - add to database
-  const id = generateUniqueId(users);
+  const id = generateUniqueID(users);
   const hashedPassword = bcrypt.hashSync(password, 10);
   users[id] = new User(id, email, hashedPassword);
   sendAlert(res, 'Successfully Registered!');
@@ -261,7 +262,7 @@ app.post('/logout', (req, res) => {
 // New url request
 app.post('/urls', (req, res) => {
   // new url permissions
-  const userID = req.session.user_id;
+  const userID = req.session.userID;
   if (isForbidden(userID, users)) return res.sendStatus(403);
 
   // new url error handling
@@ -272,7 +273,7 @@ app.post('/urls', (req, res) => {
   }
 
   // new url success
-  const id = generateUniqueId(urlDatabase);
+  const id = generateUniqueID(urlDatabase);
   urlDatabase[id] = new ShortURL(id, longURL, userID);
   sendAlert(res, 'Added new Short URL', 'success');
   res.redirect('/urls');
@@ -282,18 +283,19 @@ app.post('/urls', (req, res) => {
 // Edit url request
 app.put('/urls/:id', (req, res) => {
   // edit permissions
-  const userID = req.session.user_id;
+  const userID = req.session.userID;
   const shortURL = urlDatabase[req.params.id];
   if (isForbidden(userID, users, shortURL)) return res.sendStatus(403);
 
   // edit error handling
   const longURL = autofillHttpPrefix(req.body.longURL);
-  if (!longURL) {
+  if (!shortURL || !longURL) {
     sendAlert(res, 'Invalid URL', 'danger');
-    return res.redirect('/urls/' + shortURL.id);
+    return res.redirect('/urls/' + shortURL?.id);
   }
 
   // edit success
+  console.log(shortURL);
   shortURL.longURL = longURL;
   sendAlert(res, 'Updated ' + shortURL.id);
   res.redirect('/urls/' + shortURL.id);
@@ -303,7 +305,7 @@ app.put('/urls/:id', (req, res) => {
 // Delete url request
 app.delete('/urls/:id', (req, res) => {
   // delete permissions
-  const userID = req.session.user_id;
+  const userID = req.session.userID;
   const shortURL = urlDatabase[req.params.id];
   if (isForbidden(userID, users, shortURL)) return res.sendStatus(403);
 

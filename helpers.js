@@ -20,9 +20,9 @@ const generateUniqueId = (database, length = 6, attempts = 100) => {
 /** Checks if submission includes http(s):// prefix and adds it if it doesn't */
 // Not a catch all, but helps with some improper url submissions
 const autofillHttpPrefix = (longURL) => {
-  const newUrl = longURL.trim();
-  if (!newUrl) return null;
-  return newUrl.includes('://') ? newUrl : 'https://' + newUrl;
+  const newURL = longURL.trim();
+  if (!newURL) return null;
+  return newURL.includes('://') ? newURL : 'https://' + newURL;
 };
 
 /** Uses cookies to trigger alerts. Will replace with middleware alternative eventually. */
@@ -47,25 +47,25 @@ const isForbidden = (userID, userDatabase, shortURL) => !userDatabase[userID] ||
 const getUserByEmail = (email, userDatabase) => Object.values(userDatabase).find(user => user.email === email) || null;
 
 /** @returns {object} New object with matching URLs or empty object if none found */
-const getUserUrls = (userID, urlDatabase) => {
-  const userUrls = {};
+const getUserURLs = (userID, urlDatabase) => {
+  const userURLs = {};
   for (const key in urlDatabase) {
     if (urlDatabase[key].ownerID === userID) {
-      userUrls[key] = urlDatabase[key];
+      userURLs[key] = urlDatabase[key];
     }
   }
-  return userUrls;
+  return userURLs;
 };
 
 /** Checks if user already has a public ID via cookies and sets one if not. Stores new visit in ShortURL. Doesn't return a value. */
-const trackVisit = (req, res, shortURL, publicIds) => {
-  let visitor_id = req.cookies.visitor_id;
-  if (!visitor_id) {
-    visitor_id = generateUniqueId(publicIds);
-    res.cookie('visitor_id', visitor_id);
+const trackVisit = (req, res, shortURL, publicIDs) => {
+  let visitorID = req.cookies.visitorID;
+  if (!visitorID) {
+    visitorID = generateUniqueId(publicIDs);
+    res.cookie('visitorID', visitorID);
   }
   const timestamp = format(new Date(), 'MM/dd/yyyy HH:mm:ss');
-  shortURL.addVisit(visitor_id, timestamp);
+  shortURL.addVisit(visitorID, timestamp);
 };
 
 module.exports = {
@@ -75,6 +75,6 @@ module.exports = {
   clearAlert,
   isForbidden,
   getUserByEmail,
-  getUserUrls,
+  getUserURLs,
   trackVisit,
 };
